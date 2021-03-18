@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.model;
 
+import com.vandeilson.APIwallet.enums.UsersTiposEnums;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,15 +12,16 @@ import javax.persistence.*;
 @Table(name = "usuariocomum")
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommonUser {
+public class Users {
 
-    public CommonUser(String fullName, String cpf, String email, String senha, Float walletAmount){
+    public Users(String fullName, String cpf, String email, String senha, Float walletAmount, UsersTiposEnums type){
         super();
         this.fullName = fullName;
         this.cpf = cpf;
         this.email = email;
         this.senha = senha;
         this.walletAmount = walletAmount;
+        this.type = type;
     }
 
     @Id
@@ -40,4 +42,8 @@ public class CommonUser {
 
     @Column
     private Float walletAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UsersTiposEnums type;
 }

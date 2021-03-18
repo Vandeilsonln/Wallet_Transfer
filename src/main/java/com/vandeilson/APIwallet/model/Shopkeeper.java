@@ -1,4 +1,4 @@
-package com.vandeilson.APIwallet.entity;
+package com.vandeilson.APIwallet.model;
 
 import lombok.Data;
 

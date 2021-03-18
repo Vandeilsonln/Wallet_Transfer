@@ -24,4 +24,7 @@ public class Shopkeeper {
 
     @Column(nullable = false)
     private String senha;
+
+    @Column
+    private Float walletAmount;
 }

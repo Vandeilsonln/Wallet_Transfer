@@ -1,6 +1,6 @@
 package com.vandeilson.APIwallet.service;
 
-import com.vandeilson.APIwallet.model.CommonUser;
+import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.repository.CommonUserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +16,11 @@ public class CommonUserService {
     @Autowired
     private CommonUserRepository commonUserRepository;
 
-    public List<CommonUser> findAll() {
+    public List<Users> findAll() {
         return commonUserRepository.findAll();
     }
 
-    public Optional<CommonUser> getById(Long id) {
+    public Optional<Users> getById(Long id) {
         verifyIfExists(id);
         return commonUserRepository.findById(id);
     }
@@ -29,13 +29,13 @@ public class CommonUserService {
         commonUserRepository.findById(id);
     }
 
-    public CommonUser registerNewUser(CommonUser commonUser) {
-        return commonUserRepository.save(commonUser);
+    public Users registerNewUser(Users users) {
+        return commonUserRepository.save(users);
     }
 
-    public CommonUser updateUserInfo(Long id, CommonUser commonUser) {
-        commonUser.setId(id);
-        return commonUserRepository.save(commonUser);
+    public Users updateUserInfo(Long id, Users users) {
+        users.setId(id);
+        return commonUserRepository.save(users);
     }
 
     public void deleteUser(Long id) {

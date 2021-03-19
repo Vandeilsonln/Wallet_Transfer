@@ -3,6 +3,7 @@ package com.vandeilson.APIwallet.service;
 import com.vandeilson.APIwallet.enums.UsersTiposEnums;
 import com.vandeilson.APIwallet.exceptions.EmailOrCpfAlreadyRegisteredException;
 import com.vandeilson.APIwallet.exceptions.LojistaCanNotTransferMoneyException;
+import com.vandeilson.APIwallet.exceptions.PayerDoesNotHaveEnoughMoney;
 import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.repository.UsersRepository;
@@ -47,13 +48,15 @@ public class UsersService {
     }
 
     @Transactional(rollbackFor = LojistaCanNotTransferMoneyException.class)
-    public void transferMoney(Long idPayer, Long idPayee, Float value) throws UserNotFoundException, LojistaCanNotTransferMoneyException {
+    public void transferMoney(Long idPayer, Long idPayee, Float value) throws UserNotFoundException, LojistaCanNotTransferMoneyException, PayerDoesNotHaveEnoughMoney {
         verifyIfExists(idPayer);
         verifyIfExists(idPayee);
 
         verifyIfPayerIsNotLojista(idPayer);
 
         Users payer = getById(idPayer).orElse(null);
+        verifyIfPayerHasEnoughMoney(payer.getWalletAmount(), value);
+
         Users payee = getById(idPayee).orElse(null);
 
         Float updatedWalletPayer = payer.getWalletAmount() - value;
@@ -64,7 +67,6 @@ public class UsersService {
 
         updateUserInfo(idPayer, payer);
         updateUserInfo(idPayee, payee);
-
     }
 
     private void verifyIfExists(Long id) throws UserNotFoundException{
@@ -78,6 +80,12 @@ public class UsersService {
 
         if (optUsersEmail.isPresent() || optUsersCpf.isPresent()){
             throw new EmailOrCpfAlreadyRegisteredException();
+        }
+    }
+
+    private void verifyIfPayerHasEnoughMoney(Float payerCurrentAmount, Float valueToBeDeducted) throws PayerDoesNotHaveEnoughMoney {
+        if (valueToBeDeducted > payerCurrentAmount) {
+            throw new PayerDoesNotHaveEnoughMoney(payerCurrentAmount, valueToBeDeducted);
         }
     }
 

@@ -2,6 +2,7 @@ package com.vandeilson.APIwallet.controller;
 
 import com.vandeilson.APIwallet.exceptions.EmailOrCpfAlreadyRegisteredException;
 import com.vandeilson.APIwallet.exceptions.LojistaCanNotTransferMoneyException;
+import com.vandeilson.APIwallet.exceptions.PayerDoesNotHaveEnoughMoney;
 import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.service.UsersService;
@@ -49,7 +50,7 @@ public class UsersController {
     }
 
     @PutMapping("/transfer/{idPayer}/{idPayee}/{value}")
-    public void transferMoney(@PathVariable Long idPayer, @PathVariable Long idPayee, @PathVariable Float value) throws UserNotFoundException, LojistaCanNotTransferMoneyException {
+    public void transferMoney(@PathVariable Long idPayer, @PathVariable Long idPayee, @PathVariable Float value) throws UserNotFoundException, LojistaCanNotTransferMoneyException, PayerDoesNotHaveEnoughMoney {
         usersService.transferMoney(idPayer, idPayee, value);
     }
 

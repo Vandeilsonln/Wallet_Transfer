@@ -32,10 +32,10 @@ public class UsersService {
         return usersRepository.save(users);
     }
 
-    public Users updateUserInfo(Long id, Users users) throws UserNotFoundException {
+    public void updateUserInfo(Long id, Users users) throws UserNotFoundException {
         verifyIfExists(id);
         users.setId(id);
-        return usersRepository.save(users);
+        usersRepository.save(users);
     }
 
     public void deleteUser(Long id) throws UserNotFoundException{

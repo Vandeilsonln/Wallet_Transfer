@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.controller;
 
+import com.vandeilson.APIwallet.exceptions.EmailOrCpfAlreadyRegisteredException;
 import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.service.UsersService;
@@ -30,7 +31,7 @@ public class UsersController {
 
     @PostMapping("/registerUser")
     @ResponseStatus(HttpStatus.CREATED)
-    public Users registerUser(@RequestBody Users users){
+    public Users registerUser(@RequestBody Users users) throws EmailOrCpfAlreadyRegisteredException {
         return usersService.registerNewUser(users);
     }
 

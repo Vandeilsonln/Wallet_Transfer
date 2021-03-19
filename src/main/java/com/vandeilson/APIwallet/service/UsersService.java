@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.service;
 
+import com.vandeilson.APIwallet.exceptions.EmailOrCpfAlreadyRegisteredException;
 import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.repository.UsersRepository;
@@ -26,7 +27,8 @@ public class UsersService {
         return usersRepository.findById(id);
     }
 
-    public Users registerNewUser(Users users) {
+    public Users registerNewUser(Users users) throws EmailOrCpfAlreadyRegisteredException {
+        verifyIfEmailOrCPFIsAlreadyRegistered(users);
         return usersRepository.save(users);
     }
 
@@ -44,6 +46,15 @@ public class UsersService {
     private void verifyIfExists(Long id) throws UserNotFoundException{
         usersRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    private void verifyIfEmailOrCPFIsAlreadyRegistered(Users user) throws EmailOrCpfAlreadyRegisteredException {
+        Optional<Users> optUsersEmail =  usersRepository.findByEmail(user.getEmail());
+        Optional<Users> optUsersCpf = usersRepository.findByCpf(user.getCpf());
+
+        if (optUsersEmail.isPresent() || optUsersCpf.isPresent()){
+            throw new EmailOrCpfAlreadyRegisteredException();
+        }
     }
 
 }

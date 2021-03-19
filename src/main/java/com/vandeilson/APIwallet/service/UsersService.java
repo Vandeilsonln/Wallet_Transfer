@@ -1,6 +1,8 @@
 package com.vandeilson.APIwallet.service;
 
+import com.vandeilson.APIwallet.enums.UsersTiposEnums;
 import com.vandeilson.APIwallet.exceptions.EmailOrCpfAlreadyRegisteredException;
+import com.vandeilson.APIwallet.exceptions.LojistaCanNotTransferMoneyException;
 import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.repository.UsersRepository;
@@ -43,7 +45,12 @@ public class UsersService {
         usersRepository.deleteById(id);
     }
 
-    public void transferMoney(Long idPayer, Long idPayee, Float value) throws UserNotFoundException {
+    public void transferMoney(Long idPayer, Long idPayee, Float value) throws UserNotFoundException, LojistaCanNotTransferMoneyException {
+        verifyIfExists(idPayer);
+        verifyIfExists(idPayee);
+
+        verifyIfPayerIsNotLojista(idPayer);
+
         Users payer = getById(idPayer).orElse(null);
         Users payee = getById(idPayee).orElse(null);
 
@@ -55,7 +62,6 @@ public class UsersService {
 
         updateUserInfo(idPayer, payer);
         updateUserInfo(idPayee, payee);
-
 
     }
 
@@ -70,6 +76,15 @@ public class UsersService {
 
         if (optUsersEmail.isPresent() || optUsersCpf.isPresent()){
             throw new EmailOrCpfAlreadyRegisteredException();
+        }
+    }
+
+    private void verifyIfPayerIsNotLojista(Long id) throws LojistaCanNotTransferMoneyException {
+        Users optUser = usersRepository.findById(id).orElse(null);
+
+        assert optUser != null;
+        if (optUser.getType() != UsersTiposEnums.common){
+            throw new LojistaCanNotTransferMoneyException();
         }
     }
 }

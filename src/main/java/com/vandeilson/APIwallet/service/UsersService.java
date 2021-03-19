@@ -43,6 +43,22 @@ public class UsersService {
         usersRepository.deleteById(id);
     }
 
+    public void transferMoney(Long idPayer, Long idPayee, Float value) throws UserNotFoundException {
+        Users payer = getById(idPayer).orElse(null);
+        Users payee = getById(idPayee).orElse(null);
+
+        Float updatedWalletPayer = payer.getWalletAmount() - value;
+        Float updatedWalletPayee = payee.getWalletAmount() + value;
+
+        payer.setWalletAmount(updatedWalletPayer);
+        payee.setWalletAmount(updatedWalletPayee);
+
+        updateUserInfo(idPayer, payer);
+        updateUserInfo(idPayee, payee);
+
+
+    }
+
     private void verifyIfExists(Long id) throws UserNotFoundException{
         usersRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException(id));
@@ -56,5 +72,4 @@ public class UsersService {
             throw new EmailOrCpfAlreadyRegisteredException();
         }
     }
-
 }

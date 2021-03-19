@@ -46,4 +46,9 @@ public class UsersController {
         usersService.deleteUser(id);
     }
 
+    @PutMapping("/transfer/{idPayer}/{idPayee}/{value}")
+    public void transferMoney(@PathVariable Long idPayer, @PathVariable Long idPayee, @PathVariable Float value) throws UserNotFoundException {
+        usersService.transferMoney(idPayer, idPayee, value);
+    }
+
 }

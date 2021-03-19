@@ -9,6 +9,7 @@ import com.vandeilson.APIwallet.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,7 @@ public class UsersService {
         usersRepository.deleteById(id);
     }
 
+    @Transactional(rollbackFor = LojistaCanNotTransferMoneyException.class)
     public void transferMoney(Long idPayer, Long idPayee, Float value) throws UserNotFoundException, LojistaCanNotTransferMoneyException {
         verifyIfExists(idPayer);
         verifyIfExists(idPayee);

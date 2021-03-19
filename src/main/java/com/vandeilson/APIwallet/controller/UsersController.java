@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.controller;
 
+import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.service.UsersService;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class UsersController {
     }
 
     @GetMapping("/byId/{id}")
-    public Users getById(@PathVariable Long id){
+    public Users getById(@PathVariable Long id) throws UserNotFoundException {
         return usersService.getById(id).orElse(null);
     }
 
@@ -34,15 +35,14 @@ public class UsersController {
     }
 
     @PutMapping("/update/{id}")
-    public Users updateUser(@PathVariable Long id, @RequestBody Users users){
+    public Users updateUser(@PathVariable Long id, @RequestBody Users users) throws UserNotFoundException {
         return usersService.updateUserInfo(id, users);
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/delete/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Long id){
+    public void deleteById(@PathVariable Long id) throws UserNotFoundException {
         usersService.deleteUser(id);
     }
-
 
 }

@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.service;
 
+import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.repository.UsersRepository;
 import lombok.AllArgsConstructor;
@@ -20,25 +21,29 @@ public class UsersService {
         return usersRepository.findAll();
     }
 
-    public Optional<Users> getById(Long id) {
+    public Optional<Users> getById(Long id) throws UserNotFoundException {
         verifyIfExists(id);
         return usersRepository.findById(id);
-    }
-
-    private void verifyIfExists(Long id){
-        usersRepository.findById(id);
     }
 
     public Users registerNewUser(Users users) {
         return usersRepository.save(users);
     }
 
-    public Users updateUserInfo(Long id, Users users) {
+    public Users updateUserInfo(Long id, Users users) throws UserNotFoundException {
+        verifyIfExists(id);
         users.setId(id);
         return usersRepository.save(users);
     }
 
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id) throws UserNotFoundException{
+        verifyIfExists(id);
         usersRepository.deleteById(id);
     }
+
+    private void verifyIfExists(Long id) throws UserNotFoundException{
+        usersRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
 }

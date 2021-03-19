@@ -5,12 +5,14 @@ import com.vandeilson.APIwallet.exceptions.EmailOrCpfAlreadyRegisteredException;
 import com.vandeilson.APIwallet.exceptions.LojistaCanNotTransferMoneyException;
 import com.vandeilson.APIwallet.exceptions.PayerDoesNotHaveEnoughMoney;
 import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
+import com.vandeilson.APIwallet.model.AuthPayment;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.repository.UsersRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +20,9 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class UsersService {
+
+    @Autowired
+    RestTemplate authExterno;
 
     @Autowired
     private UsersRepository usersRepository;
@@ -59,6 +64,8 @@ public class UsersService {
 
         Users payee = getById(idPayee).orElse(null);
 
+        authPayment();
+
         Float updatedWalletPayer = payer.getWalletAmount() - value;
         Float updatedWalletPayee = payee.getWalletAmount() + value;
 
@@ -96,5 +103,10 @@ public class UsersService {
         if (optUser.getType() != UsersTiposEnums.common){
             throw new LojistaCanNotTransferMoneyException();
         }
+    }
+
+    private AuthPayment authPayment(){
+        return authExterno.getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6", AuthPayment.class);
+
     }
 }

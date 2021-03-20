@@ -1,10 +1,7 @@
 package com.vandeilson.APIwallet.service;
 
 import com.vandeilson.APIwallet.enums.UsersTiposEnums;
-import com.vandeilson.APIwallet.exceptions.EmailOrCpfAlreadyRegisteredException;
-import com.vandeilson.APIwallet.exceptions.LojistaCanNotTransferMoneyException;
-import com.vandeilson.APIwallet.exceptions.PayerDoesNotHaveEnoughMoney;
-import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
+import com.vandeilson.APIwallet.exceptions.ExecutionException;
 import com.vandeilson.APIwallet.model.PaymentAuthorization;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.repository.UsersRepository;
@@ -31,29 +28,29 @@ public class UsersService {
         return usersRepository.findAll();
     }
 
-    public Optional<Users> getById(Long id) throws UserNotFoundException {
+    public Optional<Users> getById(Long id) throws ExecutionException {
         verifyIfExists(id);
         return usersRepository.findById(id);
     }
 
-    public Users registerNewUser(Users users) throws EmailOrCpfAlreadyRegisteredException {
+    public Users registerNewUser(Users users) throws ExecutionException {
         verifyIfEmailOrCPFIsAlreadyRegistered(users);
         return usersRepository.save(users);
     }
 
-    public void updateUserInfo(Long id, Users users) throws UserNotFoundException {
+    public void updateUserInfo(Long id, Users users) throws ExecutionException {
         verifyIfExists(id);
         users.setId(id);
         usersRepository.save(users);
     }
 
-    public void deleteUser(Long id) throws UserNotFoundException{
+    public void deleteUser(Long id) throws ExecutionException {
         verifyIfExists(id);
         usersRepository.deleteById(id);
     }
 
-    @Transactional(rollbackFor = LojistaCanNotTransferMoneyException.class)
-    public void transferMoney(Long idPayer, Long idPayee, Float value) throws UserNotFoundException, LojistaCanNotTransferMoneyException, PayerDoesNotHaveEnoughMoney {
+    @Transactional(rollbackFor = ExecutionException.class, timeout = 5)
+    public void transferMoney(Long idPayer, Long idPayee, Float value) throws ExecutionException {
         verifyIfExists(idPayer);
         verifyIfExists(idPayee);
 
@@ -64,7 +61,7 @@ public class UsersService {
 
         Users payee = getById(idPayee).orElse(null);
 
-        authPayment();
+        authorizePayment();
 
         Float updatedWalletPayer = payer.getWalletAmount() - value;
         Float updatedWalletPayee = payee.getWalletAmount() + value;
@@ -76,36 +73,40 @@ public class UsersService {
         updateUserInfo(idPayee, payee);
     }
 
-    private void verifyIfExists(Long id) throws UserNotFoundException{
-        usersRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException(id));
+    private void verifyIfExists(Long id) throws ExecutionException {
+        Users user = usersRepository.findById(id)
+            .orElseThrow(() -> new ExecutionException("User not found"));
     }
 
-    private void verifyIfEmailOrCPFIsAlreadyRegistered(Users user) throws EmailOrCpfAlreadyRegisteredException {
+    private void verifyIfEmailOrCPFIsAlreadyRegistered(Users user) throws ExecutionException {
         Optional<Users> optUsersEmail =  usersRepository.findByEmail(user.getEmail());
         Optional<Users> optUsersCpf = usersRepository.findByCpf(user.getCpf());
 
         if (optUsersEmail.isPresent() || optUsersCpf.isPresent()){
-            throw new EmailOrCpfAlreadyRegisteredException();
+            throw new ExecutionException("Either the e-mail or the CPF is already registered");
         }
     }
 
-    private void verifyIfPayerHasEnoughMoney(Float payerCurrentAmount, Float valueToBeDeducted) throws PayerDoesNotHaveEnoughMoney {
+    private void verifyIfPayerHasEnoughMoney(Float payerCurrentAmount, Float valueToBeDeducted) throws ExecutionException {
         if (valueToBeDeducted > payerCurrentAmount) {
-            throw new PayerDoesNotHaveEnoughMoney(payerCurrentAmount, valueToBeDeducted);
+            throw new ExecutionException("This user does not have funds for this transaction. Total funs: %f");
         }
     }
 
-    private void verifyIfPayerIsNotLojista(Long id) throws LojistaCanNotTransferMoneyException {
+    private void verifyIfPayerIsNotLojista(Long id) throws ExecutionException {
         Users optUser = usersRepository.findById(id).orElse(null);
 
         assert optUser != null;
         if (optUser.getType() != UsersTiposEnums.common){
-            throw new LojistaCanNotTransferMoneyException();
+            throw new ExecutionException("Lojistas are not allowed to send money, only to receive");
         }
     }
 
-    private PaymentAuthorization authPayment(){
-        return authExterno.getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6", PaymentAuthorization.class);
+    private void authorizePayment() throws ExecutionException {
+        PaymentAuthorization returnedMessage = authExterno.getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6", PaymentAuthorization.class);
+        if (!returnedMessage.message.equals("Autorizado")){
+            throw new ExecutionException("Transaction not authorized");
+        }
+
     }
 }

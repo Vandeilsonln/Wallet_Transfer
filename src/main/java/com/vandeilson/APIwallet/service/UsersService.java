@@ -5,7 +5,7 @@ import com.vandeilson.APIwallet.exceptions.EmailOrCpfAlreadyRegisteredException;
 import com.vandeilson.APIwallet.exceptions.LojistaCanNotTransferMoneyException;
 import com.vandeilson.APIwallet.exceptions.PayerDoesNotHaveEnoughMoney;
 import com.vandeilson.APIwallet.exceptions.UserNotFoundException;
-import com.vandeilson.APIwallet.model.AuthPayment;
+import com.vandeilson.APIwallet.model.PaymentAuthorization;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.repository.UsersRepository;
 import lombok.AllArgsConstructor;
@@ -105,8 +105,7 @@ public class UsersService {
         }
     }
 
-    private AuthPayment authPayment(){
-        return authExterno.getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6", AuthPayment.class);
-
+    private PaymentAuthorization authPayment(){
+        return authExterno.getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6", PaymentAuthorization.class);
     }
 }

@@ -1,5 +1,5 @@
 package com.vandeilson.APIwallet.model;
 
-public class AuthPayment {
+public class PaymentAuthorization {
     public String message;
 }

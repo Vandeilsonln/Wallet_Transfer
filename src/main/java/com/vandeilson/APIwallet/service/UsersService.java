@@ -1,7 +1,7 @@
 package com.vandeilson.APIwallet.service;
 
 import com.vandeilson.APIwallet.dto.response.UsersResponseDTO;
-import com.vandeilson.APIwallet.enums.UsersTiposEnums;
+import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
 import com.vandeilson.APIwallet.exceptions.ExecutionException;
 import com.vandeilson.APIwallet.model.PaymentAuthorization;
 import com.vandeilson.APIwallet.model.Users;
@@ -80,9 +80,9 @@ public class UsersService {
 
     private void verifyIfEmailOrCPFIsAlreadyRegistered(Users user) throws ExecutionException {
         Optional<Users> optUsersEmail =  usersRepository.findByEmail(user.getEmail());
-        Optional<Users> optUsersCpf = usersRepository.findByCpf(user.getCpf());
+        Optional<Users> optUsersCpfCnpj = usersRepository.findByCpfCnpj(user.getCpfCnpj());
 
-        if (optUsersEmail.isPresent() || optUsersCpf.isPresent()){
+        if (optUsersEmail.isPresent() || optUsersCpfCnpj.isPresent()){
             throw new ExecutionException("Either the e-mail or the CPF is already registered");
         }
     }
@@ -94,7 +94,7 @@ public class UsersService {
     }
 
     private void verifyIfPayerIsNotLojista(UsersTiposEnums type) throws ExecutionException {
-        if (type != UsersTiposEnums.common){
+        if (type != UsersTiposEnums.fisica){
             throw new ExecutionException("Lojistas are not allowed to send money, only to receive");
         }
     }

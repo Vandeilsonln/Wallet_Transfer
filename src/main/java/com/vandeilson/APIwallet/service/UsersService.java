@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,8 +34,7 @@ public class UsersService {
     }
 
     public Optional<Users> getById(Long id) throws ExecutionException {
-        verifyIfExists(id);
-        return usersRepository.findById(id);
+        return Optional.of( usersRepository.findById(id).orElseThrow(() -> new ExecutionException("User not found")));
     }
 
     public Users registerNewUser(Users users) throws ExecutionException {
@@ -55,12 +55,8 @@ public class UsersService {
 
     @Transactional(rollbackFor = ExecutionException.class, timeout = 5)
     public void transferMoney(Long idPayer, Long idPayee, Float value) throws ExecutionException {
-        verifyIfExists(idPayer);
-        verifyIfExists(idPayee);
-
-        verifyIfPayerIsNotLojista(idPayer);
-
         Users payer = getById(idPayer).orElse(null);
+        verifyIfPayerIsNotLojista(Objects.requireNonNull(payer).getType());
         verifyIfPayerHasEnoughMoney(payer.getWalletAmount(), value);
 
         Users payee = getById(idPayee).orElse(null);
@@ -78,7 +74,7 @@ public class UsersService {
     }
 
     private void verifyIfExists(Long id) throws ExecutionException {
-        Users user = usersRepository.findById(id)
+        usersRepository.findById(id)
             .orElseThrow(() -> new ExecutionException("User not found"));
     }
 
@@ -97,11 +93,8 @@ public class UsersService {
         }
     }
 
-    private void verifyIfPayerIsNotLojista(Long id) throws ExecutionException {
-        Users optUser = usersRepository.findById(id).orElse(null);
-
-        assert optUser != null;
-        if (optUser.getType() != UsersTiposEnums.common){
+    private void verifyIfPayerIsNotLojista(UsersTiposEnums type) throws ExecutionException {
+        if (type != UsersTiposEnums.common){
             throw new ExecutionException("Lojistas are not allowed to send money, only to receive");
         }
     }

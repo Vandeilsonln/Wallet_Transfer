@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,7 +40,12 @@ public class UsersService {
 
     public Users registerNewUser(Users users) throws ExecutionException {
         verifyIfEmailOrCPFIsAlreadyRegistered(users);
-        return usersRepository.save(users);
+        try {
+            return usersRepository.save(users);
+        } catch (ConstraintViolationException e){
+            throw new ExecutionException("It is not possible to write CPF to a 'juridica' type OR CNPJ to 'fisica' type");
+        }
+
     }
 
     public void updateUserInfo(Long id, Users users) throws ExecutionException {

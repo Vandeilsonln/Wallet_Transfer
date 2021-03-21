@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -25,8 +26,10 @@ public class UsersService {
     @Autowired
     private UsersRepository usersRepository;
 
-    public List<Users> findAll() {
-        return usersRepository.findAll();
+    public List<UsersResponseDTO> findAll() {
+        return usersRepository.findAll().stream()
+                .map(UsersResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
     public Optional<Users> getById(Long id) throws ExecutionException {

@@ -21,7 +21,7 @@ public class UsersController {
     private UsersService usersService;
 
     @GetMapping("/all")
-    public List<Users> getAllCommonUsers(){return usersService.findAll();}
+    public List<UsersResponseDTO> getAllCommonUsers(){return usersService.findAll();}
 
     @GetMapping("/byId/{id}")
     public UsersResponseDTO getById(@PathVariable Long id) throws ExecutionException {

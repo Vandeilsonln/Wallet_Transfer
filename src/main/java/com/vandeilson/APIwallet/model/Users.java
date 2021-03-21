@@ -14,16 +14,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Users {
 
-    public Users(String fullName, String cpf, String email, String senha, Float walletAmount, UsersTiposEnums type){
-        super();
-        this.fullName = fullName;
-        this.cpf = cpf;
-        this.email = email;
-        this.senha = senha;
-        this.walletAmount = walletAmount;
-        this.type = type;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

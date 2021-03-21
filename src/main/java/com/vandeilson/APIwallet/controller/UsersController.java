@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.controller;
 
+import com.vandeilson.APIwallet.dto.response.UsersResponseDTO;
 import com.vandeilson.APIwallet.exceptions.ExecutionException;
 import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.service.UsersService;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("api/v1/users")
@@ -19,13 +21,11 @@ public class UsersController {
     private UsersService usersService;
 
     @GetMapping("/all")
-    public List<Users> getAllCommonUsers(){
-        return usersService.findAll();
-    }
+    public List<Users> getAllCommonUsers(){return usersService.findAll();}
 
     @GetMapping("/byId/{id}")
-    public Users getById(@PathVariable Long id) throws ExecutionException {
-        return usersService.getById(id).orElse(null);
+    public UsersResponseDTO getById(@PathVariable Long id) throws ExecutionException {
+        return new UsersResponseDTO(Objects.requireNonNull(usersService.getById(id).orElse(null)));
     }
 
     @PostMapping("/registerUser")

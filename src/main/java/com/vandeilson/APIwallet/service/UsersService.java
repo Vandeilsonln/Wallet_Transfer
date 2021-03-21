@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.service;
 
+import com.vandeilson.APIwallet.dto.response.UsersResponseDTO;
 import com.vandeilson.APIwallet.enums.UsersTiposEnums;
 import com.vandeilson.APIwallet.exceptions.ExecutionException;
 import com.vandeilson.APIwallet.model.PaymentAuthorization;

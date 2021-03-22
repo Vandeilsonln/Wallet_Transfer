@@ -39,8 +39,8 @@ public class UsersService {
     }
 
     public Users registerNewUser(Users users) throws ExecutionException {
-        verifyIfEmailIsAlreadyRegistered(users);
-        verifyIfCpfOrCnpjIsAlreadyRegistered(users);
+        verifyIfEmailIsAlreadyRegistered(users.getEmail());
+        verifyIfCpfOrCnpjIsAlreadyRegistered(users.getCpfCnpj());
 
         try {
             return usersRepository.save(users);
@@ -86,15 +86,15 @@ public class UsersService {
             .orElseThrow(() -> new ExecutionException(String.format("User with Id %d not found", id)));
     }
 
-    private void verifyIfEmailIsAlreadyRegistered(Users user) throws ExecutionException {
-        Optional<Users> optUsersEmail =  usersRepository.findByEmail(user.getEmail());
+    private void verifyIfEmailIsAlreadyRegistered(String email) throws ExecutionException {
+        Optional<Users> optUsersEmail =  usersRepository.findByEmail(email);
         if (optUsersEmail.isPresent()){
             throw new ExecutionException("This e-mail is already registered");
         }
     }
 
-    private void verifyIfCpfOrCnpjIsAlreadyRegistered(Users user) throws ExecutionException {
-        Optional<Users> optUsersCpfCnpj = usersRepository.findByCpfCnpj(user.getCpfCnpj());
+    private void verifyIfCpfOrCnpjIsAlreadyRegistered(String cpfCnpj ) throws ExecutionException {
+        Optional<Users> optUsersCpfCnpj = usersRepository.findByCpfCnpj(cpfCnpj);
         if (optUsersCpfCnpj.isPresent()){
             throw new ExecutionException("This CPF or CNPJ is already registered");
         }

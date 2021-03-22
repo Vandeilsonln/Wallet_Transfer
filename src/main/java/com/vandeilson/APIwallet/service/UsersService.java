@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,12 +38,14 @@ public class UsersService {
     }
 
     public Users registerNewUser(Users users) throws ExecutionException {
-        verifyIfEmailOrCPFIsAlreadyRegistered(users);
-        try {
-            return usersRepository.save(users);
-        } catch (ConstraintViolationException e){
-            throw new ExecutionException("It is not possible to write CPF to a 'juridica' type OR CNPJ to 'fisica' type");
-        }
+        verifyIfEmailIsAlreadyRegistered(users);
+        verifyIfCpfOrCnpjIsAlreadyRegistered(users);
+        return usersRepository.save(users);
+//        try {
+//            return usersRepository.save(users);
+//        } catch (ConstraintViolationException e){
+//            throw new ExecutionException("It is not possible to write CPF to a 'juridica' type OR CNPJ to 'fisica' type");
+//        }
 
     }
 
@@ -81,21 +82,26 @@ public class UsersService {
 
     private void verifyIfExists(Long id) throws ExecutionException {
         usersRepository.findById(id)
-            .orElseThrow(() -> new ExecutionException("User not found"));
+            .orElseThrow(() -> new ExecutionException(String.format("User with Id %d not found", id)));
     }
 
-    private void verifyIfEmailOrCPFIsAlreadyRegistered(Users user) throws ExecutionException {
+    private void verifyIfEmailIsAlreadyRegistered(Users user) throws ExecutionException {
         Optional<Users> optUsersEmail =  usersRepository.findByEmail(user.getEmail());
-        Optional<Users> optUsersCpfCnpj = usersRepository.findByCpfCnpj(user.getCpfCnpj());
+        if (optUsersEmail.isPresent()){
+            throw new ExecutionException("This e-mail is already registered");
+        }
+    }
 
-        if (optUsersEmail.isPresent() || optUsersCpfCnpj.isPresent()){
-            throw new ExecutionException("Either the e-mail or the CPF is already registered");
+    private void verifyIfCpfOrCnpjIsAlreadyRegistered(Users user) throws ExecutionException {
+        Optional<Users> optUsersCpfCnpj = usersRepository.findByCpfCnpj(user.getCpfCnpj());
+        if (optUsersCpfCnpj.isPresent()){
+            throw new ExecutionException("This CPF or CNPJ is already registered");
         }
     }
 
     private void verifyIfPayerHasEnoughMoney(Float payerCurrentAmount, Float valueToBeDeducted) throws ExecutionException {
         if (valueToBeDeducted > payerCurrentAmount) {
-            throw new ExecutionException("This user does not have funds for this transaction. Total funs: %f");
+            throw new ExecutionException(String.format("This user does not have funds for this transaction. Total funds: %.2f", payerCurrentAmount));
         }
     }
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,18 +35,18 @@ public class UsersService {
     }
 
     public Optional<Users> getById(Long id) throws ExecutionException {
-        return Optional.of( usersRepository.findById(id).orElseThrow(() -> new ExecutionException("User not found")));
+        return Optional.of( usersRepository.findById(id).orElseThrow(() -> new ExecutionException(String.format("User with Id %d not found", id))));
     }
 
     public Users registerNewUser(Users users) throws ExecutionException {
         verifyIfEmailIsAlreadyRegistered(users);
         verifyIfCpfOrCnpjIsAlreadyRegistered(users);
-        return usersRepository.save(users);
-//        try {
-//            return usersRepository.save(users);
-//        } catch (ConstraintViolationException e){
-//            throw new ExecutionException("It is not possible to write CPF to a 'juridica' type OR CNPJ to 'fisica' type");
-//        }
+
+        try {
+            return usersRepository.save(users);
+        } catch (ConstraintViolationException e){
+            throw new ExecutionException("It is not possible to write CPF to a 'juridica' type OR CNPJ to 'fisica' type");
+        }
 
     }
 
@@ -63,7 +64,7 @@ public class UsersService {
     @Transactional(rollbackFor = ExecutionException.class, timeout = 5)
     public void transferMoney(Long idPayer, Long idPayee, Float value) throws ExecutionException {
         Users payer = getById(idPayer).orElse(null);
-        verifyIfPayerIsNotLojista(Objects.requireNonNull(payer).getType());
+        verifyIfPayerIsNotJuridica(Objects.requireNonNull(payer).getType());
         verifyIfPayerHasEnoughMoney(payer.getWalletAmount(), value);
 
         Users payee = getById(idPayee).orElse(null);
@@ -105,7 +106,7 @@ public class UsersService {
         }
     }
 
-    private void verifyIfPayerIsNotLojista(UsersTiposEnums type) throws ExecutionException {
+    private void verifyIfPayerIsNotJuridica(UsersTiposEnums type) throws ExecutionException {
         if (type != UsersTiposEnums.fisica){
             throw new ExecutionException("Lojistas are not allowed to send money, only to receive");
         }

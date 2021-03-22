@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.controller;
 
+import com.vandeilson.APIwallet.dto.request.UsersRequestDTO;
 import com.vandeilson.APIwallet.dto.response.UsersResponseDTO;
 import com.vandeilson.APIwallet.exceptions.ExecutionException;
 import com.vandeilson.APIwallet.model.Users;
@@ -30,8 +31,9 @@ public class UsersController {
 
     @PostMapping("/registerUser")
     @ResponseStatus(HttpStatus.CREATED)
-    public Users registerUser(@RequestBody Users users) throws ExecutionException {
-        return usersService.registerNewUser(users);
+    public UsersRequestDTO registerUser(@RequestBody UsersRequestDTO usersRequestDTO) throws ExecutionException {
+        this.usersService.registerNewUser(usersRequestDTO.toModel());
+        return usersRequestDTO;
     }
 
     @PutMapping("/update/{id}")

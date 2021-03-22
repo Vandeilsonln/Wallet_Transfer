@@ -7,6 +7,7 @@ import com.vandeilson.APIwallet.utils.UsersGroupSequenceProvider;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.group.GroupSequenceProvider;
@@ -19,6 +20,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @GroupSequenceProvider(UsersGroupSequenceProvider.class)
+@Accessors(chain = true)
 public class Users {
 
     @Id
@@ -39,7 +41,7 @@ public class Users {
     @Column(nullable = false)
     private String senha;
 
-    @Column
+    @Column(columnDefinition = "DECIMAL(6,2) DEFAULT 0.0")
     private Float walletAmount;
 
     @Enumerated(EnumType.STRING)

@@ -103,13 +103,13 @@ public class UsersService {
         }
     }
 
-    public void verifyIfUserTypeIsCorrectWithCpf(Users users) throws ExecutionException{
+    private void verifyIfUserTypeIsCorrectWithCpf(Users users) throws ExecutionException{
         if(users.getType().getDocumento() == "CPF" && users.getCpfCnpj().length() != 11){
             throw new ExecutionException("Error with CPF. Please, check the number and try again");
         }
     }
 
-    public void verifyIfUserTypeIsCorrectWithCnpj(Users users) throws ExecutionException{
+    private void verifyIfUserTypeIsCorrectWithCnpj(Users users) throws ExecutionException{
         if(users.getType().getDocumento() == "CNPJ" && users.getCpfCnpj().length() != 14){
             throw new ExecutionException("Error with CNPJ. Please, check the number and try again");
         }
@@ -129,6 +129,7 @@ public class UsersService {
 
     private void authorizePayment() throws ExecutionException {
         PaymentAuthorization returnedMessage = authExterno.getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6", PaymentAuthorization.class);
+        assert returnedMessage != null;
         if (!returnedMessage.message.equals("Autorizado")){
             throw new ExecutionException("Transaction not authorized");
         }

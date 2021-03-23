@@ -36,4 +36,12 @@ public class UserServiceTest {
 
     }
 
+    @Test
+    public void givenCpfOrCnpjWithPunctuationThenShouldFormatToOnlyNumbers() throws ExecutionException {
+
+        UsersRequestDTO user = new UsersRequestDTO( "Nobre","86.733.107/0001-64", "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.juridica);
+        when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson","86733107000164", "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica), new Users(2L, "Nobre","74343980000161", "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.juridica));
+        assertEquals("86733107000164", usersService.registerNewUser(user.toModel()).getCpfCnpj());
+
+    }
 }

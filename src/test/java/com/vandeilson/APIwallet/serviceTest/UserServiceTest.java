@@ -29,7 +29,7 @@ public class UserServiceTest {
 
 
     @Test
-    public void whenRegisterNewUserThenShouldCreateUser() throws ExecutionException {
+    public void whenRegisterNewUserThenShouldCreateUserWithId() throws ExecutionException {
 
         UsersRequestDTO user = new UsersRequestDTO( "Vandeilson","42183918829", "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica);
         when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson","42183918829", "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica));

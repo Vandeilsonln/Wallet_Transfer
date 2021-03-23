@@ -41,11 +41,14 @@ public class UsersService {
     public Users registerNewUser(Users users) throws ExecutionException {
         verifyIfEmailIsAlreadyRegistered(users.getEmail());
         verifyIfCpfOrCnpjIsAlreadyRegistered(users.getCpfCnpj());
+        verifyIfUserTypeIsCorrectWithCpf(users);
+        verifyIfUserTypeIsCorrectWithCnpj(users);
 
         try {
             return usersRepository.save(users);
         } catch (ConstraintViolationException e){
-            throw new ExecutionException("It is not possible to write CPF to a 'juridica' type OR CNPJ to 'fisica' type");
+            System.out.println(e.getMessage());
+            throw new ExecutionException("Validation Error. Please, check all the fields and try again");
         }
 
     }
@@ -96,7 +99,19 @@ public class UsersService {
     private void verifyIfCpfOrCnpjIsAlreadyRegistered(String cpfCnpj ) throws ExecutionException {
         Optional<Users> optUsersCpfCnpj = usersRepository.findByCpfCnpj(cpfCnpj);
         if (optUsersCpfCnpj.isPresent()){
-            throw new ExecutionException("This CPF or CNPJ is already registered");
+            throw new ExecutionException("This document number is already registered");
+        }
+    }
+
+    public void verifyIfUserTypeIsCorrectWithCpf(Users users) throws ExecutionException{
+        if(users.getType().getDocumento() == "CPF" && users.getCpfCnpj().length() != 11){
+            throw new ExecutionException("Error with CPF. Please, check the number and try again");
+        }
+    }
+
+    public void verifyIfUserTypeIsCorrectWithCnpj(Users users) throws ExecutionException{
+        if(users.getType().getDocumento() == "CNPJ" && users.getCpfCnpj().length() != 14){
+            throw new ExecutionException("Error with CNPJ. Please, check the number and try again");
         }
     }
 

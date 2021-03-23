@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.*;
@@ -37,11 +36,21 @@ public class UserServiceTest {
     }
 
     @Test
-    public void givenCpfOrCnpjWithPunctuationThenShouldFormatToOnlyNumbers() throws ExecutionException {
+    public void givenCnpjWithPunctuationThenShouldFormatToOnlyNumbers() throws ExecutionException {
 
         UsersRequestDTO user = new UsersRequestDTO( "Nobre","86.733.107/0001-64", "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.juridica);
-        when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson","86733107000164", "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica), new Users(2L, "Nobre","74343980000161", "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.juridica));
+        when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson","86733107000164", "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica));
         assertEquals("86733107000164", usersService.registerNewUser(user.toModel()).getCpfCnpj());
 
     }
+
+    @Test
+    public void givenCpfWithPunctuationThenShouldFormatToOnlyNumbers() throws ExecutionException {
+
+        UsersRequestDTO user = new UsersRequestDTO( "Nobre","111.619.170-98", "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.fisica);
+        when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson","11161917098", "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica));
+        assertEquals("11161917098", usersService.registerNewUser(user.toModel()).getCpfCnpj());
+
+    }
+    
 }

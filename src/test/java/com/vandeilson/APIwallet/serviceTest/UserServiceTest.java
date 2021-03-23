@@ -6,12 +6,14 @@ import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
 import com.vandeilson.APIwallet.repository.UsersRepository;
 import com.vandeilson.APIwallet.service.UsersService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,5 +54,12 @@ public class UserServiceTest {
         assertEquals("11161917098", usersService.registerNewUser(user.toModel()).getCpfCnpj());
 
     }
-    
+
+    @Test
+    public void whenGetAllUsersShouldReturnAListOfUsers(){
+        when(usersRepository.findAll()).thenReturn(Stream
+                .of(new Users(1L, "Vandeilson","42183918829", "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica), new Users(2L, "Nobre","74343980000161", "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.juridica)).collect(Collectors.toList()));
+        assertEquals(2,usersService.findAll().size());
+    }
+
 }

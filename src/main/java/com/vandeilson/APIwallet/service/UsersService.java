@@ -35,7 +35,8 @@ public class UsersService {
     }
 
     public Optional<Users> getById(Long id) throws ExecutionException {
-        return Optional.of( usersRepository.findById(id).orElseThrow(() -> new ExecutionException(String.format("User with Id %d not found", id))));
+        return Optional.of( usersRepository.findById(id).orElseThrow(() -> new ExecutionException(String
+                .format("User with Id %d not found", id))));
     }
 
     public Users registerNewUser(Users users) throws ExecutionException {
@@ -115,9 +116,11 @@ public class UsersService {
         }
     }
 
-    private void verifyIfPayerHasEnoughMoney(Float payerCurrentAmount, Float valueToBeDeducted) throws ExecutionException {
+    private void verifyIfPayerHasEnoughMoney(Float payerCurrentAmount, Float valueToBeDeducted)throws ExecutionException {
         if (valueToBeDeducted > payerCurrentAmount) {
-            throw new ExecutionException(String.format("This user does not have funds for this transaction. Total funds: %.2f", payerCurrentAmount));
+            throw new ExecutionException(String
+                    .format("This user does not have funds for this transaction. Total funds: %.2f",
+                            payerCurrentAmount));
         }
     }
 
@@ -128,7 +131,9 @@ public class UsersService {
     }
 
     private void authorizePayment() throws ExecutionException {
-        PaymentAuthorization returnedMessage = authExterno.getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6", PaymentAuthorization.class);
+        PaymentAuthorization returnedMessage = authExterno
+                .getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6",
+                        PaymentAuthorization.class);
         assert returnedMessage != null;
         if (!returnedMessage.message.equals("Autorizado")){
             throw new ExecutionException("Transaction not authorized");

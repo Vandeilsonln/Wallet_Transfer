@@ -29,11 +29,11 @@ public class Users {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "nome_completo")
     @NotEmpty
     private String fullName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "cpf_cnpj")
     @CPF(groups = CpfGroup.class)
     @CNPJ(groups = CnpjGroup.class)
     private String cpfCnpj;
@@ -47,10 +47,10 @@ public class Users {
     @Size(min = 2, max = 24)
     private String senha;
 
-    @Column(columnDefinition = "DECIMAL(6,2) DEFAULT 0.0")
+    @Column(columnDefinition = "DECIMAL(8,2) DEFAULT 0.0", name = "wallet_amount")
     private Float walletAmount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "user_type")
     private UsersTiposEnums type;
 }

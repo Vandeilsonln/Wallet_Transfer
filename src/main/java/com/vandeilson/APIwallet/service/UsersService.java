@@ -90,10 +90,10 @@ public class UsersService {
         updateUserInfo(transfer.getIdPayer(), payer);
         updateUserInfo(transfer.getIdPayee(), payee);
 
-        transferService.registerNewTransfer(transfer);
+        registerTransfer(transfer);
     }
 
-    private void verifyIfExists(Long id) throws ExecutionException {
+    public void verifyIfExists(Long id) throws ExecutionException {
         usersRepository.findById(id)
             .orElseThrow(() -> new ExecutionException(String.format("User with Id %d not found", id)));
     }
@@ -151,6 +151,9 @@ public class UsersService {
         if (!returnedMessage.message.equals("Autorizado")){
             throw new ExecutionException("Transaction not authorized");
         }
+    }
 
+    private void registerTransfer(Transfer transfer){
+        transferService.registerNewTransfer(transfer);
     }
 }

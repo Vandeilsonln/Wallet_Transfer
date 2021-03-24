@@ -6,6 +6,7 @@ import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
 import com.vandeilson.APIwallet.service.UsersService;
 import io.restassured.http.ContentType;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -56,7 +57,30 @@ public class UsersControllerTest {
         .when()
                 .delete("api/v1/users/delete/{id}", 1L)
         .then()
-                .statusCode(204)
+                .statusCode(HttpStatus.NO_CONTENT.value())
                 .log().all();
+    }
+
+    @Test
+    public void shouldReturnCreatedWhenRegisterNewUser(){
+
+        JSONObject request = new JSONObject();
+
+        request.put("fullName","Vandeilson");
+        request.put("cpfCnpj","74343980000161");
+        request.put("email", "email@email.com.br");
+        request.put("senha", "123abc");
+        request.put("walletAmount", 1000f);
+        request.put("type", "juridica");
+
+        given()
+                .header("Content-Type", "application/json")
+                .body(request.toJSONString())
+        .when()
+                .post("api/v1/users/registerUser")
+        .then()
+                .statusCode(HttpStatus.CREATED.value())
+                .log().all();
+
     }
 }

@@ -42,8 +42,7 @@ public class UsersService {
     public Users registerNewUser(Users users) throws ExecutionException {
         verifyIfEmailIsAlreadyRegistered(users.getEmail());
         verifyIfCpfOrCnpjIsAlreadyRegistered(users.getCpfCnpj());
-        verifyIfUserTypeIsCorrectWithCpf(users);
-        verifyIfUserTypeIsCorrectWithCnpj(users);
+        verifyIfDocumentNumberIsCorrect(users);
 
         try {
             return usersRepository.save(users);
@@ -56,6 +55,7 @@ public class UsersService {
 
     public void updateUserInfo(Long id, Users users) throws ExecutionException {
         verifyIfExists(id);
+        verifyIfDocumentNumberIsCorrect(users);
         users.setId(id);
         usersRepository.save(users);
     }
@@ -104,14 +104,19 @@ public class UsersService {
         }
     }
 
-    private void verifyIfUserTypeIsCorrectWithCpf(Users users) throws ExecutionException{
-        if(users.getType().getDocumento() == "CPF" && users.getCpfCnpj().length() != 11){
+    private void verifyIfDocumentNumberIsCorrect(Users users) throws ExecutionException {
+        verifyIfUserTypeIsCorrectWithCpf(users.getType().getDocumento(), users.getCpfCnpj().length());
+        verifyIfUserTypeIsCorrectWithCnpj(users.getType().getDocumento(), users.getCpfCnpj().length());
+    }
+
+    private void verifyIfUserTypeIsCorrectWithCpf(String document, int size) throws ExecutionException{
+        if(document == "CPF" && size != 11){
             throw new ExecutionException("Error with CPF. Please, check the number and try again");
         }
     }
 
-    private void verifyIfUserTypeIsCorrectWithCnpj(Users users) throws ExecutionException{
-        if(users.getType().getDocumento() == "CNPJ" && users.getCpfCnpj().length() != 14){
+    private void verifyIfUserTypeIsCorrectWithCnpj(String document, int size) throws ExecutionException{
+        if(document == "CNPJ" && size != 14){
             throw new ExecutionException("Error with CNPJ. Please, check the number and try again");
         }
     }

@@ -3,7 +3,6 @@ package com.vandeilson.APIwallet.controller;
 import com.vandeilson.APIwallet.dto.request.UsersRequestDTO;
 import com.vandeilson.APIwallet.dto.response.UsersResponseDTO;
 import com.vandeilson.APIwallet.exceptions.ExecutionException;
-import com.vandeilson.APIwallet.model.Users;
 import com.vandeilson.APIwallet.service.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +36,8 @@ public class UsersController {
     }
 
     @PutMapping("/update/{id}")
-    public void updateUser(@PathVariable Long id, @RequestBody Users users) throws ExecutionException {
-        usersService.updateUserInfo(id, users);
+    public void updateUser(@PathVariable Long id, @RequestBody UsersRequestDTO usersRequestDTO) throws ExecutionException {
+        usersService.updateUserInfo(id, usersRequestDTO.toModel());
     }
 
     @DeleteMapping("/delete/{id}")

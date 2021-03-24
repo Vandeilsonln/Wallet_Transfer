@@ -28,7 +28,7 @@ public class UsersService {
     @Autowired
     private UsersRepository usersRepository;
 
-    public List<UsersResponseDTO> findAll() {
+    public List<UsersResponseDTO> getAll() {
         return usersRepository.findAll().stream()
                 .map(UsersResponseDTO::new)
                 .collect(Collectors.toList());

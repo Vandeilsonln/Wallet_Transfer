@@ -72,7 +72,7 @@ public class UserServiceTest {
                         new Users(2L, "Nobre","74343980000161", "emailjuridica@email.com.br",
                                 "456def", 1000f, UsersTiposEnums.juridica))
                 .collect(Collectors.toList()));
-        assertEquals(2,usersService.findAll().size());
+        assertEquals(2,usersService.getAll().size());
     }
 
 }

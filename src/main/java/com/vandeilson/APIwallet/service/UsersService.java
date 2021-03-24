@@ -1,6 +1,7 @@
 package com.vandeilson.APIwallet.service;
 
 import com.vandeilson.APIwallet.dto.response.UsersResponseDTO;
+import com.vandeilson.APIwallet.model.Transfer;
 import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
 import com.vandeilson.APIwallet.exceptions.ExecutionException;
 import com.vandeilson.APIwallet.model.PaymentAuthorization;
@@ -27,6 +28,9 @@ public class UsersService {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private TransferService transferService;
 
     public List<UsersResponseDTO> getAll() {
         return usersRepository.findAll().stream()
@@ -66,23 +70,27 @@ public class UsersService {
     }
 
     @Transactional(rollbackFor = ExecutionException.class, timeout = 5)
-    public void transferMoney(Long idPayer, Long idPayee, Float value) throws ExecutionException {
-        Users payer = getById(idPayer).orElse(null);
-        verifyIfPayerIsNotJuridica(Objects.requireNonNull(payer).getType());
-        verifyIfPayerHasEnoughMoney(payer.getWalletAmount(), value);
+    public void transferMoney(Transfer transfer) throws ExecutionException {
+        Float amount = transfer.getAmount();
 
-        Users payee = getById(idPayee).orElse(null);
+        Users payer = getById(transfer.getIdPayer()).orElse(null);
+        verifyIfPayerIsNotJuridica(Objects.requireNonNull(payer).getType());
+        verifyIfPayerHasEnoughMoney(payer.getWalletAmount(), amount);
+
+        Users payee = getById(transfer.getIdPayee()).orElse(null);
 
         authorizePayment();
 
-        Float updatedWalletPayer = payer.getWalletAmount() - value;
-        Float updatedWalletPayee = payee.getWalletAmount() + value;
+        Float updatedWalletPayer = payer.getWalletAmount() - amount;
+        Float updatedWalletPayee = payee.getWalletAmount() + amount;
 
         payer.setWalletAmount(updatedWalletPayer);
         payee.setWalletAmount(updatedWalletPayee);
 
-        updateUserInfo(idPayer, payer);
-        updateUserInfo(idPayee, payee);
+        updateUserInfo(transfer.getIdPayer(), payer);
+        updateUserInfo(transfer.getIdPayee(), payee);
+
+        transferService.registerNewTransfer(transfer);
     }
 
     private void verifyIfExists(Long id) throws ExecutionException {

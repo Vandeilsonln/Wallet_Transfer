@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.controller;
 
+import com.vandeilson.APIwallet.dto.request.TransferRequestDTO;
 import com.vandeilson.APIwallet.dto.request.UsersRequestDTO;
 import com.vandeilson.APIwallet.dto.response.UsersResponseDTO;
 import com.vandeilson.APIwallet.exceptions.ExecutionException;
@@ -92,15 +93,14 @@ public class UsersController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "Money transferred with success"
-                    ),
+            ),
             @ApiResponse(responseCode = "404",
                     description = "It is not possible to make this transaction. Either the payer have no funds" +
                             " or the payer is a 'juridica' user type.",
                     content = @Content)})
-    @PutMapping("/transfer/{idPayer}/{idPayee}/{value}")
-    public void transferMoney(@PathVariable Long idPayer, @PathVariable Long idPayee,
-                              @PathVariable Float value) throws ExecutionException {
-        usersService.transferMoney(idPayer, idPayee, value);
+    @PutMapping("/transfer/")
+    public void transferMoney(@RequestBody TransferRequestDTO transferRequestDTO) throws ExecutionException {
+        usersService.transferMoney(transferRequestDTO.toModel());
     }
 
 }

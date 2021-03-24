@@ -26,6 +26,7 @@ public class UsersRequestDTO {
                 .setSenha(this.senha)
                 .setWalletAmount(this.walletAmount)
                 .setType(this.type);
+
         return users;
     }
 }

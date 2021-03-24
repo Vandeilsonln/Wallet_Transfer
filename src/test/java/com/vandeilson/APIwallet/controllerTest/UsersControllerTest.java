@@ -15,6 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.*;
 
@@ -33,10 +35,10 @@ public class UsersControllerTest {
     }
 
     @Test
-    public void shouldReturnSuccessWhenGetAllUsersById() throws ExecutionException {
+    public void shouldReturnSuccessWhenGetUserById() throws ExecutionException {
 
         Mockito.when(this.usersService.getById(1L))
-                .thenReturn(Optional.of(new Users(1L, "Vandeilson", "42183918829",
+                .thenReturn(Optional.of(new Users(1L, "Vandeilson", "11161917098",
                         "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica)));
 
         given()
@@ -45,5 +47,16 @@ public class UsersControllerTest {
                 .get("api/v1/users/byId/{id}", 1L)
         .then()
                 .statusCode(HttpStatus.OK.value());
+    }
+
+    @Test
+    public void shouldReturnNoContentWhenDeleteUser(){
+        given()
+                .accept(ContentType.JSON)
+        .when()
+                .delete("api/v1/users/delete/{id}", 1L)
+        .then()
+                .statusCode(204)
+                .log().all();
     }
 }

@@ -47,7 +47,8 @@ public class UsersControllerTest {
         .when()
                 .get("api/v1/users/byId/{id}", 1L)
         .then()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(HttpStatus.OK.value())
+                .log().all();
     }
 
     @Test
@@ -83,4 +84,29 @@ public class UsersControllerTest {
                 .log().all();
 
     }
+
+    @Test
+    public void shouldReturnOkWhenUpdateUser(){
+
+        JSONObject request = new JSONObject();
+
+        request.put("fullName","Vandeilson");
+        request.put("cpfCnpj","74343980000161");
+        request.put("email", "email@email.com.br");
+        request.put("senha", "123abc");
+        request.put("walletAmount", 1000f);
+        request.put("type", "juridica");
+
+        given()
+                .header("Content-Type", "application/json")
+                .body(request.toJSONString())
+                .when()
+                .put("api/v1/users/transfer/{idPayer}/{idPayee}/{value}", 1L, 2L, 500f)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .log().all();
+
+    }
+
+
 }

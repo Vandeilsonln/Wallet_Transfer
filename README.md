@@ -86,6 +86,31 @@
 - Em caso de qualquer falha, a operação deverá ser revertida (conceito de transactions).
 ![regras de transferência](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/transactions.PNG?raw=true)
 ---
+
+#### O conceito de transação foi aplicado através da anotação **@Transactional**. Nela, explicitamos o parâmetro "*rollbackFor*" para que a reversão da operação de transferência aconteça caso a exceção "*ExecutionException*" seja lançada. Adicionalmente, usamos o parâmetro "*timeout*" para especificar o tempo limite que a operação deve esperar; caso o autorizador externo ou o banco de dados demore muito para responder.
+
+### **1.3.3 - Regras de Negócio - Autorizador externo de pagamento**
+#### É necessário consumir uma API externa que simula a autorização da transação. Para fazer esse consumo, foi utilizade o **RestTemplate**.
+#### O primeiro passo foi criar uma classe que possa receber o valor de retorno do autorizador.
+```java
+public class PaymentAuthorization {
+    public String message;
+}
+```
+#### Também é necessário criar um arquivo de configuração e instanciar o *RestTemplate* com a anaotação *@Bean*
+```java
+@Configuration
+public class PaymentAuthorizationConfig {
+
+    @Bean
+    public RestTemplate getRestTemplate(){
+        return new RestTemplate();
+    }
+}
+```
+#### Por último basta fazer o consumo e convertê-la para a entidade *PaymentAuthorization*, através do método *getForObject*.
+![Chamada do autorizador](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/auth.PNG?raw=true)
+#### Se o valor de retorno (atributo "message") for diferente de "**Autorizado**", uma exceção será lançada, o que de desencadeará em um rollback da transferência.
 ## **1.4 - Repository**
 #### Nesta camada criamos uma interface que extende a interface *JpaRepository* do *Spring Data JPA*. É através dela que iremos usar a camada de persistência para gravar e recuperar dados, fazendo uma ponte com o banco de dados.
 ### **1.4.1 - UsersRepository**
@@ -300,6 +325,3 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 
 #### E podemos ver todos os endpoints com suas respectivas anotações pela interface gráfica do Swagger.
 ![Swagger UI](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/swagger3.PNG?raw=true)
-
-
-## **AuthrizePayment - Rest Template**

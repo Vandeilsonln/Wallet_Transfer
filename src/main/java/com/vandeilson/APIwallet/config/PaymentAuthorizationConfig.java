@@ -10,5 +10,5 @@ public class PaymentAuthorizationConfig {
     @Bean
     public RestTemplate getRestTemplate(){
         return new RestTemplate();
-    };
+    }
 }

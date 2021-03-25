@@ -34,9 +34,11 @@ public class UserServiceTest {
 
         UsersRequestDTO user = new UsersRequestDTO("Vandeilson","42183918829",
                 "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica);
+
         when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson",
                 "42183918829", "email@email.com.br", "123abc",
                 1000f, UsersTiposEnums.fisica));
+
         assertEquals(1L, usersService.registerNewUser(user.toModel()).getId());
 
     }
@@ -46,9 +48,11 @@ public class UserServiceTest {
 
         UsersRequestDTO user = new UsersRequestDTO("Nobre","86.733.107/0001-64",
                 "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.juridica);
+
         when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson",
                 "86733107000164", "email@email.com.br", "123abc",
                 1000f, UsersTiposEnums.fisica));
+
         assertEquals("86733107000164", usersService.registerNewUser(user.toModel()).getCpfCnpj());
 
     }
@@ -58,21 +62,25 @@ public class UserServiceTest {
 
         UsersRequestDTO user = new UsersRequestDTO("Nobre","111.619.170-98",
                 "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.fisica);
+
         when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson",
                 "11161917098", "email@email.com.br", "123abc",
                 1000f, UsersTiposEnums.fisica));
+
         assertEquals("11161917098", usersService.registerNewUser(user.toModel()).getCpfCnpj());
 
     }
 
     @Test
     public void whenGetAllUsersShouldReturnAListOfUsers(){
+
         when(usersRepository.findAll()).thenReturn(Stream
                 .of(new Users(1L, "Vandeilson","42183918829", "email@email.com.br",
                         "123abc", 1000f, UsersTiposEnums.fisica),
                         new Users(2L, "Nobre","74343980000161", "emailjuridica@email.com.br",
                                 "456def", 1000f, UsersTiposEnums.juridica))
                 .collect(Collectors.toList()));
+
         assertEquals(2,usersService.getAll().size());
     }
 

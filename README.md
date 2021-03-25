@@ -11,6 +11,7 @@
 - Spring Data JPA
 - Hibernate
 - Banco H2 e MySQL
+- Swagger
 - Junit / Mockito / Rest Assured
 
 ---
@@ -75,20 +76,21 @@
 #### Nesta camada criamos uma interface que extende a interface *JpaRepository* do *Spring Data JPA*. É através dela que iremos usar a camada de persistência para gravar e recuperar dados, fazendo uma ponte com o banco de dados.
 ### **1.4.1 - UsersRepository**
 #### Foram criados mais dois métodos para buscar no banco de dados.
-    ```java
-    Optional<Users> findByEmail(String email);
-    Optional<Users> findByCpfCnpj(String CpfCnpj);
-    ```
 
+ ```java
+Optional<Users> findByEmail(String email);
+Optional<Users> findByCpfCnpj(String CpfCnpj);
+```
+---
 ### **1.4.2 - TransferRepository**
-#### Foi criado um método que retorna uma lista de todas as transferências de um dado usuário, usando a anotação **@Query** para realizar uma query nativa
+#### Foi criado um método que retorna uma lista de todas as transferências de um dado usuário, usando a anotação **@Query** para realizar uma query nativa.
 ```java
 @Query(value = "SELECT * FROM transfers WHERE id_payer = ?1", nativeQuery = true)
     List<Transfer> getAllTransferById(Long id_payer);
 ```
 ---
 
-## **:hammer_and_wrench: ** 2 - Configuração dos Profiles**
+## **:hammer_and_wrench: 2 - Configuração dos Profiles**
 
 #### Foram configurados **2 profiles** para podermos testar a aplicação. 
 ![profiles](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/profiles.PNG?raw=true)
@@ -107,7 +109,7 @@ spring.profiles.active=dev
 
 #### Subindo a aplicação com esse profile, basta acessar o arquivo **application-dev.properties** e certificar que os atributos estão como abaixo abaixo:
 ```properties
-# H2 Configuration (*in-memory*)
+# H2 Configuration (in-memory)
 spring.h2.console.enabled=true
 spring.h2.console.path=/h2
 
@@ -127,7 +129,7 @@ spring.jpa.hibernate.ddl-auto=update
 
 #### É necessário a **construção das tabelas no MySQL**. A partir delas poderá ser feito o mapeamento com o Hibernate/JPA.
 #### Deve-se, portanto, criar uma database com o nome "**walletdb**", e dentro dela criar as tabelas"**usuarios**" e "**transfers**"
-![Tabelas MySQL](https://github.com/Vandeilsonln/IngredientesAPI/blob/master/_images/tabelas_mysql.png?raw=true)
+![Tabelas MySQL](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/tabelas_mysql.png?raw=true)
 
 
 #### Segue abaixo o código SQL para criação da database e das tabelas:
@@ -194,3 +196,82 @@ spring.spring.jpa.hibernate.ddl-auto=update
 spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 ```
 </details>
+
+---
+## :exclamation: **3 - Testes Unitários**
+### **3.1 - Testando a camada Service**
+#### Os testes na camada de serviço foram feitos utilizando as libs **Junit** e **Mockito**
+#### Utilizamos a anotação **@ExtendWith(MockitoExtension.class)** uma vez que usamos o Junit 5.
+![Testes do Service](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/testeservice1.png?raw=true)
+
+#### Para que os testes funcionem, é preciso usar as anotações **@Mock** e **@InjectMocks**. Dessa forma, cria-se um mock do *UserRepository*, o qual é injetado na instância criada de *UserService* pelo @InjectMocks.
+---
+#### O teste *"givenCpfWithPunctuationThenShouldFormatToOnlyNumbers()"* prevê que quando um usuário seja cadastrado com o CPF com pontos e traços, o documento seja formatado e salvo no banco com somente números.
+```java
+@Test
+    public void givenCpfWithPunctuationThenShouldFormatToOnlyNumbers() throws ExecutionException {
+
+        UsersRequestDTO user = new UsersRequestDTO("Nobre","111.619.170-98",
+                "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.fisica);
+        
+        when(usersRepository.save(user.toModel())).thenReturn(new Users(1L, "Vandeilson",
+                "11161917098", "email@email.com.br", "123abc",
+                1000f, UsersTiposEnums.fisica));
+        
+        assertEquals("11161917098", usersService.registerNewUser(user.toModel()).getCpfCnpj());
+
+    }
+```
+---
+#### O teste *"whenGetAllUsersShouldReturnAListOfUsers()"* confere se ao realizar uma busca por todos os usuários (que na simulação são 2) é retornado uma lista cujo tamanho é de 2. 
+```java
+    @Test
+    public void whenGetAllUsersShouldReturnAListOfUsers(){
+
+        when(usersRepository.findAll()).thenReturn(Stream
+                .of(new Users(1L, "Vandeilson","42183918829", "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica),
+                    new Users(2L, "Nobre","74343980000161", "emailjuridica@email.com.br", "456def", 1000f, UsersTiposEnums.juridica))
+                .collect(Collectors.toList()));
+        
+        assertEquals(2,usersService.getAll().size());
+```
+---
+### **3.2 - Testando a camada Controller**
+#### Para execução dos testes nos controllers foram usados **Junit** e **Rest Assured**.
+![Testes do Controller](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/testecontroller1.png?raw=true)
+#### Utilizamos a anotação **@WebMvcTest** em conjunto com o **@BeforeEach** para que, no momento da execução dos testes, seja subido somente os beans declarados. Isso resulta em um ganho de perfomance, já que não será carregado todo o contexto da aplicação.
+
+#### O teste *shouldReturnSuccessWhenGetUserById()* testa se o Status Code retornado ao buscar um usuário por ID é o "200".
+
+```java
+@Test
+    public void shouldReturnSuccessWhenGetUserById() throws ExecutionException {
+
+        Mockito.when(this.usersService.getById(1L))
+                .thenReturn(Optional.of(new Users(1L, "Vandeilson", "11161917098",
+                        "email@email.com.br", "123abc", 1000f, UsersTiposEnums.fisica)));
+
+        given()
+                .accept(ContentType.JSON)
+        .when()
+                .get("api/v1/users/byId/{id}", 1L)
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .log().all();
+    }
+```
+---
+#### O método *shouldReturnNoContentWhenDeleteUser()* testa se o Status code ao deletar um usuário é o "204".
+```java
+    @Test
+    public void shouldReturnNoContentWhenDeleteUser(){
+        given()
+                .accept(ContentType.JSON)
+        .when()
+                .delete("api/v1/users/delete/{id}", 1L)
+        .then()
+                .statusCode(HttpStatus.NO_CONTENT.value())
+                .log().all();
+    }
+```
+---

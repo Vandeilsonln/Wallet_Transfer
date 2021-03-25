@@ -25,10 +25,8 @@
 
 ### **1.1.1 - Users**
 
-#### Entidade que representa os usuários da aplicação. Os mesmos podem optar por se cadastrarem como pessoa *física* ou *jurídica*, desde que obedecidos os critérios de validação, que são:
-- Não pode haver dois usuários com o mesmo email ou CPF/CNPJ;
-- O número do documento deverá ser válido;
-- Não será possível cadastrar um CPF com uma pessoa jurídica e vice-versa, mesmo que o documento esteja com número validado.
+#### Entidade que representa os usuários da aplicação. Os mesmos podem optar por se cadastrarem como pessoa *física* (usuários comuns) ou *jurídica* (lojistas).
+
 
 ![Users entity](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/user_entity.PNG?raw=true)
 
@@ -41,6 +39,7 @@
 ### **1.1.2 - Transfer**
 
 #### Entidade que representa as transferências da aplicação. Elas são instanciadas a partir do momento que uma transferência for bem sucedida e contém somente os IDs de quem enviou o dinheiro, de quem recebeu e do valor transferido.
+![Transfer entity](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/transferentity.PNG?raw=true)
 ---
 ## **DTOs - Data Transfer Object**
 
@@ -70,8 +69,23 @@
 
 ## **1.3 - Service**
 #### Camada onde serão inseridas as regras de negócio, e onde é feita a injeção do repository para que seja possível a chamada dos métodos que farão as persistências no banco de dados.
+
+### **1.3.1 - Regras de negócio - Criação de usuário**
+#### Só é possível cadastrar um usuário, se as regras abaixo forem seguidas:
+- Não pode haver dois usuários com o mesmo email ou CPF/CNPJ;
+- O número do documento deverá ser válido, sendo essa função atribuída ao **Hibernate Validator**;
+- Não será possível cadastrar um CPF com uma pessoa jurídica nem um CNPJ com pessoa física.
 ---
 
+### **1.3.2 - Regras de negócio - Transferências**
+#### O core da aplicação é a transferência de dinheiro entre usuários, e para garantir que isso ocorra da maneira correta, existem algumas regras que devem ser respeitadas.
+- Não é possível enviar dinheiro para si mesmo.
+- Pessoas físicas (comuns) podem transferir tanto para outras pessoas físicas como para jurídicas (lojistas).
+- Lojistas não podem enviar dinheiro, somente receber.
+- A transação deverá ser aprovada por um autorizador externo.
+- Em caso de qualquer falha, a operação deverá ser revertida (conceito de transactions).
+![regras de transferência](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/transactions.PNG?raw=true)
+---
 ## **1.4 - Repository**
 #### Nesta camada criamos uma interface que extende a interface *JpaRepository* do *Spring Data JPA*. É através dela que iremos usar a camada de persistência para gravar e recuperar dados, fazendo uma ponte com o banco de dados.
 ### **1.4.1 - UsersRepository**
@@ -202,7 +216,7 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 ### **3.1 - Testando a camada Service**
 #### Os testes na camada de serviço foram feitos utilizando as libs **Junit** e **Mockito**
 #### Utilizamos a anotação **@ExtendWith(MockitoExtension.class)** uma vez que usamos o Junit 5.
-![Testes do Service](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/testeservice1.png?raw=true)
+![Testes do Service](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/testeservice1.PNG?raw=true)
 
 #### Para que os testes funcionem, é preciso usar as anotações **@Mock** e **@InjectMocks**. Dessa forma, cria-se um mock do *UserRepository*, o qual é injetado na instância criada de *UserService* pelo @InjectMocks.
 ---
@@ -238,7 +252,7 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 ---
 ### **3.2 - Testando a camada Controller**
 #### Para execução dos testes nos controllers foram usados **Junit** e **Rest Assured**.
-![Testes do Controller](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/testecontroller1.png?raw=true)
+![Testes do Controller](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/testecontroller1.PNG?raw=true)
 #### Utilizamos a anotação **@WebMvcTest** em conjunto com o **@BeforeEach** para que, no momento da execução dos testes, seja subido somente os beans declarados. Isso resulta em um ganho de perfomance, já que não será carregado todo o contexto da aplicação.
 
 #### O teste *shouldReturnSuccessWhenGetUserById()* testa se o Status Code retornado ao buscar um usuário por ID é o "200".
@@ -275,3 +289,17 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
     }
 ```
 ---
+
+## :books: **4 - Documentação**
+#### A API foi documentada com o Swagger através de anotações nos códigos dos Controllers.
+##### Anotações da UsersControllers:
+![Anotações da classe de controllers](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/swagger1.PNG?raw=true)
+
+##### Anotações da Transfercontrollers:
+![Anotações da classe de controllers](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/swagger2.PNG?raw=true)
+
+#### E podemos ver todos os endpoints com suas respectivas anotações pela interface gráfica do Swagger.
+![Swagger UI](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/swagger3.PNG?raw=true)
+
+
+## **AuthrizePayment - Rest Template**

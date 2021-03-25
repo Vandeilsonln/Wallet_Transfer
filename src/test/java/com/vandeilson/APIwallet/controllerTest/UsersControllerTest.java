@@ -1,5 +1,6 @@
 package com.vandeilson.APIwallet.controllerTest;
 
+import com.vandeilson.APIwallet.controller.TransferController;
 import com.vandeilson.APIwallet.controller.UsersController;
 import com.vandeilson.APIwallet.exceptions.ExecutionException;
 import com.vandeilson.APIwallet.model.Users;
@@ -29,6 +30,9 @@ public class UsersControllerTest {
 
     @MockBean
     private UsersService usersService;
+
+    @MockBean
+    private TransferController transferController;
 
     @BeforeEach
     public void setup(){
@@ -101,7 +105,7 @@ public class UsersControllerTest {
                 .header("Content-Type", "application/json")
                 .body(request.toJSONString())
                 .when()
-                .put("api/v1/users/transfer/{idPayer}/{idPayee}/{value}", 1L, 2L, 500f)
+                .put("api/v1/users/transfer", 1L, 2L, 500f)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .log().all();

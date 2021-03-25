@@ -98,7 +98,7 @@ public class UsersController {
                     description = "It is not possible to make this transaction. Either the payer have no funds" +
                             " or the payer is a 'juridica' user type.",
                     content = @Content)})
-    @PutMapping("/transfer/")
+    @PutMapping("/transfer")
     public void transferMoney(@RequestBody TransferRequestDTO transferRequestDTO) throws ExecutionException {
         usersService.transferMoney(transferRequestDTO.toModel());
     }

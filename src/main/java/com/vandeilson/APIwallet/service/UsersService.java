@@ -50,11 +50,10 @@ public class UsersService {
 
         try {
             return usersRepository.save(users);
-        } catch (ConstraintViolationException e){
+        } catch (ConstraintViolationException e) {
             System.out.println(e.getMessage());
             throw new ExecutionException("Validation Error. Please, check all the fields and try again");
         }
-
     }
 
     public void updateUserInfo(Long id, Users users) throws ExecutionException {
@@ -71,21 +70,20 @@ public class UsersService {
 
     @Transactional(rollbackFor = ExecutionException.class, timeout = 5)
     public void transferMoney(Transfer transfer) throws ExecutionException {
-        Float amount = transfer.getAmount();
+
+        if(transfer.getIdPayer() == transfer.getIdPayee()){
+            throw new ExecutionException("It is not possible to transfer money to yourself");
+        }
 
         Users payer = getById(transfer.getIdPayer()).orElse(null);
-        verifyIfPayerIsNotJuridica(Objects.requireNonNull(payer).getType());
-        verifyIfPayerHasEnoughMoney(payer.getWalletAmount(), amount);
-
         Users payee = getById(transfer.getIdPayee()).orElse(null);
+
+        verifyIfPayerIsAbleToTransfer(payer.getWalletAmount(), transfer.getAmount(),payer.getType());
 
         authorizePayment();
 
-        Float updatedWalletPayer = payer.getWalletAmount() - amount;
-        Float updatedWalletPayee = payee.getWalletAmount() + amount;
-
-        payer.setWalletAmount(updatedWalletPayer);
-        payee.setWalletAmount(updatedWalletPayee);
+        payer.setWalletAmount(subtractMoneyFromPayer(payer.getWalletAmount(), transfer.getAmount()));
+        payee.setWalletAmount(addMoneyToPayee(payee.getWalletAmount(), transfer.getAmount()));
 
         updateUserInfo(transfer.getIdPayer(), payer);
         updateUserInfo(transfer.getIdPayee(), payee);
@@ -143,6 +141,14 @@ public class UsersService {
         }
     }
 
+    private Float addMoneyToPayee(Float walletAmount, float amount) {
+        return walletAmount + amount;
+    }
+
+    private Float subtractMoneyFromPayer(Float walletAmount, float amount) {
+        return walletAmount -amount;
+    }
+
     private void authorizePayment() throws ExecutionException {
         PaymentAuthorization returnedMessage = authExterno
                 .getForObject("https://run.mocky.io/v3/8fafdd68-a090-496f-8c9a-3442cf30dae6",
@@ -151,6 +157,12 @@ public class UsersService {
         if (!returnedMessage.message.equals("Autorizado")){
             throw new ExecutionException("Transaction not authorized");
         }
+    }
+
+    private void verifyIfPayerIsAbleToTransfer(Float payerCurrentWalletAmount, Float valueToBeDeducted,
+                                               UsersTiposEnums userType) throws ExecutionException {
+        verifyIfPayerIsNotJuridica(Objects.requireNonNull(userType));
+        verifyIfPayerHasEnoughMoney(payerCurrentWalletAmount, valueToBeDeducted);
     }
 
     private void registerTransfer(Transfer transfer){

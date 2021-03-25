@@ -28,6 +28,7 @@ public class UserServiceTest {
     private UsersService usersService;
 
 
+
     @Test
     public void whenRegisterNewUserThenShouldCreateUserWithId() throws ExecutionException {
 

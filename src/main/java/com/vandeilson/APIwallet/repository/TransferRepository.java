@@ -9,5 +9,5 @@ import java.util.List;
 public interface TransferRepository extends JpaRepository<Transfer, Long> {
 
     @Query(value = "SELECT * FROM transfers WHERE id_payer = ?1", nativeQuery = true)
-    public List<Transfer> getAllTransferById(Long id_payer);
+    List<Transfer> getAllTransferById(Long id_payer);
 }

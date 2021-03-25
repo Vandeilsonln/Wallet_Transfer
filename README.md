@@ -34,3 +34,20 @@
 - **@Accessors(chain=true)**: Anotação do *Lombok* que faz os *setters* retornarem *this* ao invés de *void*.
 - **@GroupSequenceProvider**: Uma vez que temos um atributo onde pode ser validado tanto o CPF como o CNPJ, precisamos criar grupos para informar ao hibernate examente qual validação será aplicada, para que não haja conflitos ou que uma validação tenha preferência sobre a outra.
 - **@AllArgsConstructor / @NoArgsConstructor**: Criam, respectivamente, construtores com todos os argumentos; e sem argumento algum.
+
+### **1.1.2 - Transfer**
+
+#### Entidade que representa as transferências da aplicação. Elas são instanciadas a partir do momento que uma transferência for bem sucedida e contém somente os IDs de quem enviou o dinheiro, de quem recebeu e do valor transferido.
+---
+## **DTOs - Data Transfer Object**
+
+#### O *Design Pattern* DTO foi usado tanto nas classes *Users* como *Transfer*.
+#### Na entidade **Users**, usamos um **DTO na Request** não só para que não seja necessário informar o campo *id* nas requisições, mas para realizar um tratamento na string do CPF/CNPJ.
+```java
+.setCpfCnpj(this.cpfCnpj.replaceAll("[^0-9]+", ""))
+```
+- Foi usado um Regex para remover todos os caracteres que não sejam dígitos. Dessa forma, nas requisições poderão ser fornecidas tanto um documento só com os números(76601728000130), como também com pontuação(76.601.728/0001-30).
+
+- Além disso, foi usado o **DTO na Response** para que, por motivos de segurança, não sejam informados os campos **senha** e **walletAmount**.
+
+#### Na entidade **Transfer**, foi usado somente um DTO na request para que não fosse necessário informar o campo *Id*.

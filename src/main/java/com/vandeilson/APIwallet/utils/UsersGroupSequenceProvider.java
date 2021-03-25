@@ -15,7 +15,6 @@ public class UsersGroupSequenceProvider implements DefaultGroupSequenceProvider<
         if (IsUsersSelected(users)){
             groups.add(users.getType().getGroup());
         }
-
         return groups;
     }
 

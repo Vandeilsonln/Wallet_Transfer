@@ -15,6 +15,14 @@
 - Junit / Mockito / Rest Assured
 
 ---
+
+## :pushpin: **Índice**
+- 1 - Estrutura do projeto
+- 2 - Configuração dos Profiles
+- 3 - Testes Unitários
+- 4 - Documentação
+- 5 - Exemplos de requisições para testes
+- 6 - Conclusão
 ## :building_construction: **1 - Estrutura do projeto**
 
 ![Estrutura do projeto](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/estrutura_projeto.PNG?raw=true)
@@ -36,6 +44,11 @@
 - **@GroupSequenceProvider**: Uma vez que temos um atributo onde pode ser validado tanto o CPF como o CNPJ, precisamos criar grupos para informar ao hibernate examente qual validação será aplicada, para que não haja conflitos ou que uma validação tenha preferência sobre a outra.
 - **@AllArgsConstructor / @NoArgsConstructor**: Criam, respectivamente, construtores com todos os argumentos; e sem argumento algum.
 
+---
+#### Para que possamos usar o "GroupSequenceProvider", precisamos seguir os passos a seguir:
+#### Na classe **UsersTiposEnums**, temos as opções "fisica" e "juridica". Cada uma delas vai ter uma Classe como atributo.
+![Users entity](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/enum1.PNG?raw=true)
+#### Assim que tentarmos instanciar um usuário, o campo "type" será verificado e, por exemplo, caso seja "juridica", o **Hibernate** vai rodar a validação da anotação que utilizou como argumento o grupo **CnpjGroup.class**, que nesse exemplo é o "**@CNPJ**"", que fica na classe "Users".
 ### **1.1.2 - Transfer**
 
 #### Entidade que representa as transferências da aplicação. Elas são instanciadas a partir do momento que uma transferência for bem sucedida e contém somente os IDs de quem enviou o dinheiro, de quem recebeu e do valor transferido.
@@ -88,7 +101,7 @@
 ---
 
 #### O conceito de transação foi aplicado através da anotação **@Transactional**. Nela, explicitamos o parâmetro "*rollbackFor*" para que a reversão da operação de transferência aconteça caso a exceção "*ExecutionException*" seja lançada. Adicionalmente, usamos o parâmetro "*timeout*" para especificar o tempo limite que a operação deve esperar; caso o autorizador externo ou o banco de dados demore muito para responder.
-
+---
 ### **1.3.3 - Regras de Negócio - Autorizador externo de pagamento**
 #### É necessário consumir uma API externa que simula a autorização da transação. Para fazer esse consumo, foi utilizade o **RestTemplate**.
 #### O primeiro passo foi criar uma classe que possa receber o valor de retorno do autorizador.
@@ -111,6 +124,7 @@ public class PaymentAuthorizationConfig {
 #### Por último basta fazer o consumo e convertê-la para a entidade *PaymentAuthorization*, através do método *getForObject*.
 ![Chamada do autorizador](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/auth.PNG?raw=true)
 #### Se o valor de retorno (atributo "message") for diferente de "**Autorizado**", uma exceção será lançada, o que de desencadeará em um rollback da transferência.
+---
 ## **1.4 - Repository**
 #### Nesta camada criamos uma interface que extende a interface *JpaRepository* do *Spring Data JPA*. É através dela que iremos usar a camada de persistência para gravar e recuperar dados, fazendo uma ponte com o banco de dados.
 ### **1.4.1 - UsersRepository**
@@ -237,7 +251,7 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 </details>
 
 ---
-## :exclamation: **3 - Testes Unitários**
+## :boom: **3 - Testes Unitários**
 ### **3.1 - Testando a camada Service**
 #### Os testes na camada de serviço foram feitos utilizando as libs **Junit** e **Mockito**
 #### Utilizamos a anotação **@ExtendWith(MockitoExtension.class)** uma vez que usamos o Junit 5.
@@ -325,3 +339,51 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 
 #### E podemos ver todos os endpoints com suas respectivas anotações pela interface gráfica do Swagger.
 ![Swagger UI](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/swagger3.PNG?raw=true)
+---
+---
+## :scroll: **5 - Exemplos de requisições para testes**
+### **5.1 - Criar usuários**
+#### Usuário comum - pessoa física
+```json
+{
+  "fullName": "Francisco Fernado Silva",
+  "cpfCnpj": "679.287.580-59",
+  "email": "franciscof.silva@email.com",
+  "senha": "QWEgnr987",
+  "walletAmount": 1000,
+  "type": "fisica"
+}
+```
+---
+
+#### **Usuário Lojista - pessoa jurídica**
+```json
+{
+  "fullName": "Smart Conserta Ltda.",
+  "cpfCnpj": "93.507.187/0001-03",
+  "email": "faleconosco@smartconserta.com.br",
+  "senha": "7d9s4fQf88",
+  "walletAmount": 5000,
+  "type": "juridica"
+}
+```
+---
+### **5.2 - Fazer transferência**
+```json
+{
+	"idPayer": 1,
+	"idPayee": 2,
+	"amount": 387.95
+}
+```
+---
+## :mortar_board: **6 - Conclusão**
+
+#### O projeto trouxe alguns desafios, como:
+- consultar APIs externas
+- aplicar conceitos de transaçõese
+- separar a validação do Hibernate por grupos
+
+#### Além de ser possível aplicar conhecimentos na parte testes unitários e boas práticas de documentação.
+#### O desafio de implementar um sistema de mensagens para avisar ao usuário sempre que receber dinheiro será o próximo a ser superado. :wink:
+---

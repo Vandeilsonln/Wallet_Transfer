@@ -1,6 +1,7 @@
 # **API Wallet Transfer - Desafio Backend**
 
 #### Esta API realiza as operações CRUD de usuários, bem como a transferência de dinheiro entre eles.
+![REST http Verbs](https://www.codeproject.com/KB/webservices/826383/table.png)
 
 ### :computer: **Tecnologias usadas**
 
@@ -28,7 +29,7 @@
 - O número do documento deverá ser válido;
 - Não será possível cadastrar um CPF com uma pessoa jurídica e vice-versa, mesmo que o documento esteja com número validado.
 
-![Estrutura do projeto](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/user_entity.PNG?raw=true)
+![Users entity](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/user_entity.PNG?raw=true)
 
 #### Foram usadas as seguintes anotações para auxiliar no desenvolvimento:
 - **@Data**: Anotação do *Lombok* que se encarrega de criar os *getters* e *setters* em tempo de compilação.
@@ -60,8 +61,136 @@
 
 ### **1.2.1 - UsersController**
 #### Esse controller chama os métodos da camada de serviços **usersService**. É aqui que ocorrem as operações de cadastrar, buscar, alterar e deletar usuários; bem como E Para reduzirmos o acoplamento, utilizamos a anotação **@Autowired** para realizarmos a *injeção de dependência*.
-![Estrutura do projeto](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/user_controller.PNG?raw=true)
+![Users controllers](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/user_controller.PNG?raw=true)
 
 ### **1.2.2 - TransferController**
 #### Esse controller faz o registro de todas as transferências bem sucedidas, bem como a consulta das mesmas.
 ---
+
+## **1.3 - Service**
+#### Camada onde serão inseridas as regras de negócio, e onde é feita a injeção do repository para que seja possível a chamada dos métodos que farão as persistências no banco de dados.
+---
+
+## **1.4 - Repository**
+#### Nesta camada criamos uma interface que extende a interface *JpaRepository* do *Spring Data JPA*. É através dela que iremos usar a camada de persistência para gravar e recuperar dados, fazendo uma ponte com o banco de dados.
+### **1.4.1 - UsersRepository**
+#### Foram criados mais dois métodos para buscar no banco de dados.
+    ```java
+    Optional<Users> findByEmail(String email);
+    Optional<Users> findByCpfCnpj(String CpfCnpj);
+    ```
+
+### **1.4.2 - TransferRepository**
+#### Foi criado um método que retorna uma lista de todas as transferências de um dado usuário, usando a anotação **@Query** para realizar uma query nativa
+```java
+@Query(value = "SELECT * FROM transfers WHERE id_payer = ?1", nativeQuery = true)
+    List<Transfer> getAllTransferById(Long id_payer);
+```
+---
+
+## **:hammer_and_wrench: ** 2 - Configuração dos Profiles**
+
+#### Foram configurados **2 profiles** para podermos testar a aplicação. 
+![profiles](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/profiles.PNG?raw=true)
+
+ - O profile "**prod**" vai subir a aplicação com o banco de dados **MySQL**. O código para a criação de tudo será fornecido logo abaixo! :relaxed:
+ - O profile "**dev**" vai subir a aplicação com o banco **H2 *in-memory***. Dessa forma, é possível testar os métodos sem inteferir no banco de produção, além de não ser necessário nenhum software adicional instalado. Além do mais, a aplicação poderá ser testada através da plataforma em nuvem **Heroku**.
+---
+
+#### A forma de escolher qual o profile será o ativo na hora de rodar a aplicação é através do aquivo **application.properties**. Por padrão, o profile ativo será o **dev**. Caso queira rodar a aplicação com o *MySQL*, basta trocar o valor para "**prod**".
+```properties
+spring.profiles.active=dev
+```
+### **2.1 - Rodando com o profile *"dev" (H2)***
+<details>
+<summary>Clique aqui para visualizar a configuração</summary>
+
+#### Subindo a aplicação com esse profile, basta acessar o arquivo **application-dev.properties** e certificar que os atributos estão como abaixo abaixo:
+```properties
+# H2 Configuration (*in-memory*)
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2
+
+spring.datasource.url=jdbc:h2:mem:walletDb
+spring.datasource.username=sa
+spring.datasource.password=
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.hibernate.ddl-auto=update
+```
+</details>
+
+---
+### **2.2 - Rodando com o profile "*prod*" (MySQL)**
+<details>
+
+<summary>Clique para visualizar a configuração</summary>
+
+#### É necessário a **construção das tabelas no MySQL**. A partir delas poderá ser feito o mapeamento com o Hibernate/JPA.
+#### Deve-se, portanto, criar uma database com o nome "**walletdb**", e dentro dela criar as tabelas"**usuarios**" e "**transfers**"
+![Tabelas MySQL](https://github.com/Vandeilsonln/IngredientesAPI/blob/master/_images/tabelas_mysql.png?raw=true)
+
+
+#### Segue abaixo o código SQL para criação da database e das tabelas:
+
+```sql
+CREATE database walletdb;
+use walletdb;
+
+CREATE TABLE IF NOT EXISTS usuarios (
+id INT AUTO_INCREMENT,
+nome_completo varchar(80) not null,
+cpf_cnpj varchar(14) not null,
+email varchar(150) not null,
+senha varchar(24) not null,
+wallet_amount decimal(8,2),
+user_type varchar(8) not null,
+
+CONSTRAINT usuarios_id_pk primary key(id),
+CONSTRAINT usuarios_type CHECK(user_type in ('fisica', 'juridica'))
+);
+
+CREATE TABLE IF NOT EXISTS transfers (
+id INT auto_increment,
+id_payer int not null,
+id_payee int not null,
+amount decimal(8,2) not null,
+
+CONSTRAINT transfers_id_pk primary key(id),
+CONSTRAINT id_payer_fk FOREIGN KEY (id_payer) references usuarios(id),
+CONSTRAINT id_payee_fk foreign key (id_payee) references usuarios(id)
+);
+```
+
+<details>
+
+ <summary>Opcionalmente, podemos popular a tabela "usuarios" com alguns registros, com o código abaixo: (Clique para Expandir)</summary>
+
+```sql
+INSERT INTO usuarios (nome_completo, cpf_cnpj, email, senha, wallet_amount, user_type) 
+VALUES('Thiago Francisco Nunes', '71048762009', 'thiagonunes-75@yogoothies.com.br', 'PR1UusCYBE', 600, 'fisica');
+
+INSERT INTO usuarios (nome_completo, cpf_cnpj, email, senha, wallet_amount, user_type) 
+VALUES('Giovana e Joaquim Eletrônica', '57027737000115', 'posvenda@gioquimeletronica.com.br', '6GExHYnOk1', 2700, 'juridica');
+
+INSERT INTO usuarios (nome_completo, cpf_cnpj, email, senha, wallet_amount, user_type) 
+VALUES('Sandra Ana Jesus', '61371171629', 'sandra.jesus@email.com.br', 'n9B7wJEfWs', 1250, 'fisica');
+
+INSERT INTO usuarios (nome_completo, cpf_cnpj, email, senha, wallet_amount, user_type) 
+VALUES('Malu Entregas Expressas ME', '03801098000174', 'comunicacoes@maluexpress.com.br', 'JF11701fJyX', 5000, 'juridica');
+```
+</details>
+
+---
+#### Uma vez criado a database, devemos configurá-lo no arquivo "**application-prod.properties**", tomando os devidos cuidados com os atributos de ***url*, *username* e *password***, para que a conexão aconteça corretamente.
+
+```properties
+# MySQL configuration
+spring.datasource.url=jdbc:mysql://localhost:3306/walletdb?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=admin
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
+```
+</details>

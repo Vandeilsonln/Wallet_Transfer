@@ -1,4 +1,4 @@
-## API Wallet Transfer - Desafio Backend
+# **API Wallet Transfer - Desafio Backend**
 
 #### Esta API realiza as operações CRUD de usuários, bem como a transferência de dinheiro entre eles.
 
@@ -12,11 +12,12 @@
 - Banco H2 e MySQL
 - Junit / Mockito / Rest Assured
 
+---
 ## :building_construction: **1 - Estrutura do projeto**
 
 ![Estrutura do projeto](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/estrutura_projeto.PNG?raw=true)
 
-### **1.1 - Model**
+## **1.1 - Model**
 
 #### Camada responsável por fazer o **ORM** *(Object Relational Mapper)*, fazendo uma ponte entre uma classe no Java com o modelo relacional do banco de dados.
 
@@ -48,6 +49,19 @@
 ```
 - Foi usado um Regex para remover todos os caracteres que não sejam dígitos. Dessa forma, nas requisições poderão ser fornecidas tanto um documento só com os números(76601728000130), como também com pontuação(76.601.728/0001-30).
 
-- Além disso, foi usado o **DTO na Response** para que, por motivos de segurança, não sejam informados os campos **senha** e **walletAmount**.
+- Além disso, foi usado o **DTO na Response** para que, por motivos de segurança, não sejam apresentados os campos **senha** e **walletAmount** ao realizar as operações *GET*.
 
 #### Na entidade **Transfer**, foi usado somente um DTO na request para que não fosse necessário informar o campo *Id*.
+---
+
+## **1.2 - Controllers**
+
+#### Camada responsável por orquestrar o fluxo da aplicação ao fazer o mapeamento e o direcionamento dos *requests* para a camada de serviços.
+
+### **1.2.1 - UsersController**
+#### Esse controller chama os métodos da camada de serviços **usersService**. É aqui que ocorrem as operações de cadastrar, buscar, alterar e deletar usuários; bem como E Para reduzirmos o acoplamento, utilizamos a anotação **@Autowired** para realizarmos a *injeção de dependência*.
+![Estrutura do projeto](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/user_controller.PNG?raw=true)
+
+### **1.2.2 - TransferController**
+#### Esse controller faz o registro de todas as transferências bem sucedidas, bem como a consulta das mesmas.
+---

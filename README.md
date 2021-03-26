@@ -73,7 +73,7 @@
 #### Camada responsável por orquestrar o fluxo da aplicação ao fazer o mapeamento e o direcionamento dos *requests* para a camada de serviços.
 
 ### **1.2.1 - UsersController**
-#### Esse controller chama os métodos da camada de serviços **usersService**. É aqui que ocorrem as operações de cadastrar, buscar, alterar e deletar usuários; bem como E Para reduzirmos o acoplamento, utilizamos a anotação **@Autowired** para realizarmos a *injeção de dependência*.
+#### Esse controller chama os métodos da camada de serviços **usersService**. É aqui que ocorrem as operações de cadastrar, buscar, alterar e deletar usuários. E Para reduzirmos o acoplamento, utilizamos a anotação **@Autowired** para realizarmos a *injeção de dependência*.
 ![Users controllers](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/user_controller.PNG?raw=true)
 
 ### **1.2.2 - TransferController**
@@ -182,7 +182,7 @@ spring.jpa.hibernate.ddl-auto=update
 
 #### É necessário a **construção das tabelas no MySQL**. A partir delas poderá ser feito o mapeamento com o Hibernate/JPA.
 #### Deve-se, portanto, criar uma database com o nome "**walletdb**", e dentro dela criar as tabelas"**usuarios**" e "**transfers**"
-![Tabelas MySQL](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/tabelas_mysql.png?raw=true)
+![Tabelas MySQL](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/tabelas_mysql.PNG?raw=true)
 
 
 #### Segue abaixo o código SQL para criação da database e das tabelas:
@@ -331,10 +331,10 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 
 ## :books: **4 - Documentação**
 #### A API foi documentada com o Swagger através de anotações nos códigos dos Controllers.
-##### Anotações da UsersControllers:
+#### Anotações da UsersControllers:
 ![Anotações da classe de controllers](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/swagger1.PNG?raw=true)
 
-##### Anotações da Transfercontrollers:
+#### Anotações da Transfercontrollers:
 ![Anotações da classe de controllers](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/swagger2.PNG?raw=true)
 
 #### E podemos ver todos os endpoints com suas respectivas anotações pela interface gráfica do Swagger.
@@ -342,6 +342,16 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 ---
 ---
 ## :scroll: **5 - Exemplos de requisições para testes**
+#### Os JSONs abaixo podem ser utilizados para testar as requisições da aplicação, seja pelo **Postman** ou pela ferramenta de sua preferência.
+
+### **5.1 - Testando pelo HEROKU**
+#### Foi feito o deploy na plataforma em nuvem **Heroku**. Dessa forma é possível testar as requisições sem ter feito o clone da aplicação em sua máquina. Para testá-la, basta substituir a uri "LOCAL" pela "HEROKU":
+
+```http
+
+HEROKU -> https://wallettransfer.herokuapp.com/
+LOCAL -> http://localhost:8080/
+```
 ### **5.1 - Criar usuários**
 #### Usuário comum - pessoa física
 ```json
@@ -377,13 +387,19 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.MySQL5Dialect
 }
 ```
 ---
+#### Uma vez realizado as requisições acima, ao consultar o banco de dados, veremos a tabela com estes dados:
+![Swagger UI](https://github.com/Vandeilsonln/Wallet_Transfer/blob/master/_images/h2.PNG?raw=true)
+---
+---
+
 ## :mortar_board: **6 - Conclusão**
 
-#### O projeto trouxe alguns desafios, como:
-- consultar APIs externas
-- aplicar conceitos de transaçõese
-- separar a validação do Hibernate por grupos
-
-#### Além de ser possível aplicar conhecimentos na parte testes unitários e boas práticas de documentação.
+#### O projeto trouxe alguns desafios a serem superados, como:
+- Consurmir APIs externas;
+- Aplicar conceitos de transações;
+- Separar a validação do Hibernate por grupos;
+- Implementar o Design Pattern DTO;
+- Desenvolvimento e aplicação de testes unitários da camada de Service e Controller;
+- Documentação de projeto com Swagger.
 #### O desafio de implementar um sistema de mensagens para avisar ao usuário sempre que receber dinheiro será o próximo a ser superado. :wink:
 ---

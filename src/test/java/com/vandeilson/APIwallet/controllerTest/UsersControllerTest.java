@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Optional;
 
@@ -103,7 +104,7 @@ public class UsersControllerTest {
                 .header("Content-Type", "application/json")
                 .body(request.toJSONString())
                 .when()
-                .put("api/v1/users/transfer", 1L, 2L, 500f)
+                .put("api/v1/users/update/{id}", 1)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .log().all();

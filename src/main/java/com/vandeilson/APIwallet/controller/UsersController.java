@@ -1,9 +1,9 @@
 package com.vandeilson.APIwallet.controller;
 
-import com.vandeilson.APIwallet.dto.request.UsersRequestDTO;
-import com.vandeilson.APIwallet.dto.response.UsersResponseDTO;
-import com.vandeilson.APIwallet.exceptions.ExecutionException;
-import com.vandeilson.APIwallet.service.UsersService;
+import com.vandeilson.APIwallet.model.dto.request.UsersRequestDTO;
+import com.vandeilson.APIwallet.model.dto.response.UsersResponseDTO;
+import com.vandeilson.APIwallet.model.exceptions.ExecutionException;
+import com.vandeilson.APIwallet.model.service.UsersService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

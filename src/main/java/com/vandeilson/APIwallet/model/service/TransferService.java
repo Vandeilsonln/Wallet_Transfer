@@ -1,11 +1,11 @@
-package com.vandeilson.APIwallet.service;
+package com.vandeilson.APIwallet.model.service;
 
-import com.vandeilson.APIwallet.exceptions.ExecutionException;
-import com.vandeilson.APIwallet.model.PaymentAuthorization;
-import com.vandeilson.APIwallet.model.Transfer;
-import com.vandeilson.APIwallet.model.Users;
+import com.vandeilson.APIwallet.model.exceptions.ExecutionException;
+import com.vandeilson.APIwallet.model.utils.PaymentAuthorization;
+import com.vandeilson.APIwallet.model.entity.Transfer;
+import com.vandeilson.APIwallet.model.entity.Users;
 import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
-import com.vandeilson.APIwallet.repository.TransferRepository;
+import com.vandeilson.APIwallet.model.repository.TransferRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

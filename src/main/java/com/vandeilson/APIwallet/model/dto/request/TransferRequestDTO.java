@@ -1,6 +1,6 @@
-package com.vandeilson.APIwallet.dto.request;
+package com.vandeilson.APIwallet.model.dto.request;
 
-import com.vandeilson.APIwallet.model.Transfer;
+import com.vandeilson.APIwallet.model.entity.Transfer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

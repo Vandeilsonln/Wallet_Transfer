@@ -2,10 +2,10 @@ package com.vandeilson.APIwallet.controllerTest;
 
 import com.vandeilson.APIwallet.controller.TransferController;
 import com.vandeilson.APIwallet.controller.UsersController;
-import com.vandeilson.APIwallet.exceptions.ExecutionException;
-import com.vandeilson.APIwallet.model.Users;
+import com.vandeilson.APIwallet.model.exceptions.ExecutionException;
+import com.vandeilson.APIwallet.model.entity.Users;
 import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
-import com.vandeilson.APIwallet.service.UsersService;
+import com.vandeilson.APIwallet.model.service.UsersService;
 import io.restassured.http.ContentType;
 import org.json.simple.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Optional;
 

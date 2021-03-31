@@ -1,6 +1,6 @@
-package com.vandeilson.APIwallet.utils;
+package com.vandeilson.APIwallet.model.utils;
 
-import com.vandeilson.APIwallet.model.Users;
+import com.vandeilson.APIwallet.model.entity.Users;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import java.util.ArrayList;

@@ -1,11 +1,11 @@
 package com.vandeilson.APIwallet.serviceTest;
 
-import com.vandeilson.APIwallet.dto.request.UsersRequestDTO;
-import com.vandeilson.APIwallet.exceptions.ExecutionException;
-import com.vandeilson.APIwallet.model.Users;
+import com.vandeilson.APIwallet.model.dto.request.UsersRequestDTO;
+import com.vandeilson.APIwallet.model.exceptions.ExecutionException;
+import com.vandeilson.APIwallet.model.entity.Users;
 import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
-import com.vandeilson.APIwallet.repository.UsersRepository;
-import com.vandeilson.APIwallet.service.UsersService;
+import com.vandeilson.APIwallet.model.repository.UsersRepository;
+import com.vandeilson.APIwallet.model.service.UsersService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,6 +1,6 @@
-package com.vandeilson.APIwallet.repository;
+package com.vandeilson.APIwallet.model.repository;
 
-import com.vandeilson.APIwallet.model.Users;
+import com.vandeilson.APIwallet.model.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

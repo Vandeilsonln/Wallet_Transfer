@@ -1,6 +1,6 @@
-package com.vandeilson.APIwallet.repository;
+package com.vandeilson.APIwallet.model.repository;
 
-import com.vandeilson.APIwallet.model.Transfer;
+import com.vandeilson.APIwallet.model.entity.Transfer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

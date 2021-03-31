@@ -1,9 +1,9 @@
-package com.vandeilson.APIwallet.model;
+package com.vandeilson.APIwallet.model.entity;
 
 import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
-import com.vandeilson.APIwallet.utils.CnpjGroup;
-import com.vandeilson.APIwallet.utils.CpfGroup;
-import com.vandeilson.APIwallet.utils.UsersGroupSequenceProvider;
+import com.vandeilson.APIwallet.model.utils.CnpjGroup;
+import com.vandeilson.APIwallet.model.utils.CpfGroup;
+import com.vandeilson.APIwallet.model.utils.UsersGroupSequenceProvider;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

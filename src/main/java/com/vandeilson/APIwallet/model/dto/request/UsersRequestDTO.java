@@ -1,6 +1,6 @@
-package com.vandeilson.APIwallet.dto.request;
+package com.vandeilson.APIwallet.model.dto.request;
 
-import com.vandeilson.APIwallet.model.Users;
+import com.vandeilson.APIwallet.model.entity.Users;
 import com.vandeilson.APIwallet.model.enums.UsersTiposEnums;
 import lombok.AllArgsConstructor;
 import lombok.Data;

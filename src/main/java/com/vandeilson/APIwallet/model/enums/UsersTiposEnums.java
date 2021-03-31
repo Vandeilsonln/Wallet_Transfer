@@ -1,7 +1,7 @@
 package com.vandeilson.APIwallet.model.enums;
 
-import com.vandeilson.APIwallet.utils.CnpjGroup;
-import com.vandeilson.APIwallet.utils.CpfGroup;
+import com.vandeilson.APIwallet.model.utils.CnpjGroup;
+import com.vandeilson.APIwallet.model.utils.CpfGroup;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

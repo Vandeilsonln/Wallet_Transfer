@@ -1,4 +1,4 @@
-package com.vandeilson.APIwallet.exceptions;
+package com.vandeilson.APIwallet.model.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
